@@ -7,15 +7,18 @@ type Props = IInputProps & {
     password?: boolean
 }
 
-export function Input({ placeHolder, password, ...rest }: Props) {
+export function Input({ placeHolder, password = false, ...rest }: Props) {
 
     const [show, setShow] = useState(false)
 
     return (
         <NativeBaseInput
-            mt={2}
             bgColor="gray.100"
+            borderWidth={0}
+            borderRadius={6}
+            my={2}
             placeholder={placeHolder}
+            fontSize="md"
             type={password ? (show ? "text" : "password") : "text"}
             InputRightElement={password &&
                 <Pressable onPress={() => setShow(!show)}>

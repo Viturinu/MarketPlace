@@ -2,24 +2,28 @@ import { Button as NativeBaseButton, IButtonProps, Text } from "native-base"
 
 type Props = IButtonProps & {
     title: string;
+    type: "black" | "blue" | "gray"
 }
 
-export function Button({ title }: Props) {
+export function Button({ title, type, ...rest }: Props) {
     return (
         <NativeBaseButton
-            flex={1}
             w="full"
-            h={14}
-            bgColor="gray.300"
-            borderColor="blue.200"
-            borderWidth={1}
+            h={11}
+            mt={4}
+            bgColor={type === "gray" ? "gray.300" : type === "blue" ? "blue_light" : "gray.700"}
+            variant="ghost"
+            _pressed={{
+                bgColor: type === "gray" ? "gray.200" : type === "blue" ? "blue.400" : "gray.600"
+            }}
+            {...rest}
         >
             <Text
-                color="gray.700"
+                color={type === "gray" ? "gray.600" : type === "blue" ? "gray.100" : "gray.100"}
                 fontFamily="heading"
                 fontSize="sm"
             >
-                Teste
+                {title}
             </Text>
         </NativeBaseButton>
     )
