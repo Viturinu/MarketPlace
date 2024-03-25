@@ -1,16 +1,16 @@
-import { Button as NativeBaseButton, IButtonProps, Text } from "native-base"
+import { Button as NativeBaseButton, IButtonProps, Text, HStack } from "native-base"
+import { Icon } from "phosphor-react-native";
 
 type Props = IButtonProps & {
     title: string;
-    type: "black" | "blue" | "gray"
+    type: "black" | "blue" | "gray";
+    InternalIcon?: Icon;
 }
 
-export function Button({ title, type, ...rest }: Props) {
+export function Button({ title, type, InternalIcon, ...rest }: Props) {
     return (
         <NativeBaseButton
-            w="full"
             h={11}
-            mt={4}
             bgColor={type === "gray" ? "gray.300" : type === "blue" ? "blue_light" : "gray.700"}
             variant="ghost"
             _pressed={{
@@ -18,13 +18,19 @@ export function Button({ title, type, ...rest }: Props) {
             }}
             {...rest}
         >
-            <Text
-                color={type === "gray" ? "gray.600" : type === "blue" ? "gray.100" : "gray.100"}
-                fontFamily="heading"
-                fontSize="sm"
+            <HStack
+                alignItems="center"
             >
-                {title}
-            </Text>
+                {InternalIcon && <InternalIcon size={16} color="white" weight="regular" />}
+                <Text
+                    color={type === "gray" ? "gray.600" : type === "blue" ? "gray.100" : "gray.100"}
+                    fontFamily="heading"
+                    fontSize="sm"
+                    ml={1}
+                >
+                    {title}
+                </Text>
+            </HStack>
         </NativeBaseButton>
     )
 }
