@@ -15,14 +15,13 @@ export function ProductCard({ nome, valor, uri, ...rest }: Props) {
             {...rest}
         >
             <VStack
-                height="24"
-                width="100%"
-                alignItems="center"
+                height={24}
+                maxHeight={24}
+                flex={1}
             >
                 <HStack
                     mt={1}
                     zIndex={1}
-                    width="100%"
                 >
                     <Image
                         source={Avatar}
@@ -52,6 +51,7 @@ export function ProductCard({ nome, valor, uri, ...rest }: Props) {
                     alt="Product picture"
                     position="absolute"
                     resizeMode="stretch"
+                    rounded={6}
                     width="100%"
                     height="100%"
                 />
@@ -62,6 +62,7 @@ export function ProductCard({ nome, valor, uri, ...rest }: Props) {
                     fontSize="md"
                     color="gray.600"
                     fontFamily="body"
+                    numberOfLines={1}
                 >
                     {nome}
                 </Text>
