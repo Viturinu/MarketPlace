@@ -146,6 +146,8 @@ export function SignUp() {
                             title="Criar"
                             type="black"
                             onPress={handleSubmit(handleSignUp)}
+                            width="full"
+                            mt={3}
                         />
                     </Center>
                 </View>
@@ -158,6 +160,8 @@ export function SignUp() {
                             title="Ir para o login"
                             type="gray"
                             onPress={handleGoBack}
+                            width="full"
+                            mt={3}
                         />
                     </Center>
 

@@ -2,9 +2,9 @@ import { extendTheme } from 'native-base';
 
 export const THEME = extendTheme({
     colors: {
-        blue_dark: '#364D9D',
-        blue_light: '#647AC7',
-        red_light: '#EE7979',
+        red: {
+            100: '#EE7979'
+        },
         gray: {
             700: '#121214',
             600: '#3E3A40',
@@ -14,6 +14,10 @@ export const THEME = extendTheme({
             200: '#EDECEE',
             100: '#F7F7F8'
         },
+        blue: {
+            100: '#647AC7',
+            200: '#364D9D'
+        }
     },
     fonts: {
         heading: 'Karla_700Bold',

@@ -2,6 +2,8 @@ import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { Box, useTheme } from "native-base"
 import { AuthRoutes } from "./auth.routes";
 import { Home } from "@screens/Home";
+import { SignIn } from "@screens/SignIn";
+import { SignUp } from "@screens/SingUp";
 
 export function Routes() {
 
