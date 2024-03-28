@@ -13,11 +13,9 @@ export function Header({ title, rightIcon, backIcon = false }: Props) {
     return (
         <SafeAreaView>
             <HStack
-                style={{
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    marginTop: 5
-                }}
+                justifyContent="space-around"
+                alignItems="center"
+                mt={5}
             >
                 <View>
                     {backIcon ? <ArrowLeft /> : <View h={4} w={6} />}

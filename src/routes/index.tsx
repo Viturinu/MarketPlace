@@ -5,6 +5,7 @@ import { Home } from "@screens/Home";
 import { SignIn } from "@screens/SignIn";
 import { SignUp } from "@screens/SingUp";
 import { ProductDetails } from "@screens/ProductDetails";
+import { MyProducts } from "@screens/MyProducts";
 
 export function Routes() {
 
@@ -16,7 +17,7 @@ export function Routes() {
     return (
         <Box flex={1}>
             <NavigationContainer theme={theme}>
-                <ProductDetails />
+                <MyProducts />
             </NavigationContainer>
         </Box>
     )

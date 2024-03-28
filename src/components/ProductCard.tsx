@@ -8,9 +8,10 @@ type Props = IPressableProps & {
     nome?: string;
     valor?: string;
     uri?: string;
+    profilePicture?: boolean;
 }
 
-export function ProductCard({ nome, valor, uri, ...rest }: Props) {
+export function ProductCard({ nome, valor, uri, profilePicture = true, ...rest }: Props) {
     return (
         <Pressable
             {...rest}
@@ -24,13 +25,23 @@ export function ProductCard({ nome, valor, uri, ...rest }: Props) {
                     mt={1}
                     zIndex={1}
                 >
-                    <ProfilePicture
-                        size={6}
-                        uri={Avatar}
-                        borderColor="gray.100"
-                        mt={1}
-                        ml={1}
-                    />
+                    {
+                        profilePicture ?
+
+                            <ProfilePicture
+                                size={6}
+                                uri={Avatar}
+                                borderColor="gray.100"
+                                mt={1}
+                                ml={1}
+                            />
+                            : <Box
+                                size={6}
+                                mt={1}
+                                ml={1}
+                            />
+                    }
+
                     <Box
                         width="40%"
                     />
