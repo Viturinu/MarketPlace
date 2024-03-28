@@ -66,12 +66,14 @@ export function Input({ placeHolder, senha = false, isInvalid, errorMessage, sea
                                     title="Novo"
                                     backgroundColor="blue.100"
                                     color="gray.100"
+                                    fontSize="md"
                                 />
                                 <LittleButton
                                     title="Novo"
                                     backgroundColor="gray.300"
                                     color="gray.400"
                                     ml={2}
+                                    fontSize="md"
                                 />
                             </HStack>
                         </VStack>

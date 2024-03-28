@@ -6,7 +6,7 @@ import { Plus, Tag, ArrowRight } from "phosphor-react-native";
 import { Input } from "@components/Input";
 import { ProductCard } from "@components/ProductCard";
 import sha256 from 'crypto-js/sha256';
-import { useRef, useState } from "react";
+import { ProfilePicture } from "@components/ProfilePicture";
 
 export function Home() {
 
@@ -83,12 +83,9 @@ export function Home() {
                     <HStack
                         flex={0.5}
                     >
-                        <Image
-                            source={Avatar}
-                            alt="Imagem de profile"
+                        <ProfilePicture
                             size={11}
-                            rounded={9999}
-                            borderWidth={1}
+                            uri={Avatar}
                             borderColor="blue.100"
                         />
                         <VStack ml={2}>

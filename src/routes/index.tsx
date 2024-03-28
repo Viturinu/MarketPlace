@@ -4,6 +4,7 @@ import { AuthRoutes } from "./auth.routes";
 import { Home } from "@screens/Home";
 import { SignIn } from "@screens/SignIn";
 import { SignUp } from "@screens/SingUp";
+import { ProductDetails } from "@screens/ProductDetails";
 
 export function Routes() {
 
@@ -15,7 +16,7 @@ export function Routes() {
     return (
         <Box flex={1}>
             <NavigationContainer theme={theme}>
-                <Home />
+                <ProductDetails />
             </NavigationContainer>
         </Box>
     )
