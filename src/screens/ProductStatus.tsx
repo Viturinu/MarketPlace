@@ -1,19 +1,23 @@
 import { CarouselPicture } from "@components/CarouselPicture";
 import { Header } from "@components/Header";
 import { ProfilePicture } from "@components/ProfilePicture";
-import { Box, HStack, View, Text, TextArea, VStack, ScrollView } from "native-base";
+import { Box, HStack, View, Text, TextArea, VStack, ScrollView, Center } from "native-base";
 import { Dimensions } from "react-native";
 import Avatar from "@assets/avatar.png"
 import Carousel from 'react-native-reanimated-carousel';
 import { LittleButton } from "@components/LittleButton";
 import { PaymentMethod } from "@components/PaymentMethod";
 import { Button } from "@components/Button";
-import { WhatsappLogo } from "phosphor-react-native";
+import { Power, Trash } from "phosphor-react-native";
 
-export function ProductDetails() {
+type Props = {
+    active: boolean;
+}
+
+export function ProductStatus({ active }: Props) {
 
     const screenWidth = Dimensions.get('window').width;
-    const screenHeight40 = ((Dimensions.get('window').height) * 0.30);
+    const screenHeight40 = ((Dimensions.get('window').height) * 0.35);
 
     const images = [
         "https://source.unsplash.com/1024x768/?nature",
@@ -36,7 +40,7 @@ export function ProductDetails() {
                     renderItem={({ item }) => {
                         return <CarouselPicture
                             uri={item}
-                            active={true}
+                            active={active}
                         />
                     }}
                 />;
@@ -45,8 +49,8 @@ export function ProductDetails() {
                 showsVerticalScrollIndicator={false}
             >
                 <Box
-                    paddingX={4}
                     mb={5}
+                    paddingX={4}
                 >
 
 
@@ -123,43 +127,27 @@ export function ProductDetails() {
                             <PaymentMethod tipo="pix" />
                         </Box>
                     </VStack>
-                </Box>
-                <HStack
-                    paddingX={4}
-                    alignItems="center"
-                    justifyContent="space-between"
-                    height={20}
-                    backgroundColor="gray.100"
-                >
-                    <HStack
-                        alignItems="center"
-                        flex={0.5}
-                    >
-                        <Text
-                            fontSize="sm"
-                            fontFamily="heading"
-                            color="blue.100"
-                        >
-                            R$
-                        </Text>
-                        <Text
-                            fontSize="lg"
-                            fontFamily="heading"
-                            color="blue.100"
-                            ml={2}
-                        >
-                            120,00
-                        </Text>
-                    </HStack>
 
-                    <Button
-                        title="Entrar em contato"
-                        type="blue"
-                        InternalIcon={WhatsappLogo}
-                        weight="fill"
-                        flex={0.5}
-                    />
-                </HStack>
+                    <View
+                        mt={8}
+                    >
+
+                        <Button
+                            title={active ? "Desativar anúncio" : "Reativar anúncio"}
+                            type={active ? "black" : "blue"}
+                            InternalIcon={Power}
+                            weight="regular"
+                        />
+                        <Button
+                            title="Excluir anúncio"
+                            type="gray"
+                            InternalIcon={Trash}
+                            mt={2}
+                            weight="regular"
+                            InternalIconColor="#5F5B62"
+                        />
+                    </View>
+                </Box>
             </ScrollView>
         </Box >
     )

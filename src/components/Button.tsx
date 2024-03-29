@@ -6,9 +6,10 @@ type Props = IButtonProps & {
     type: "black" | "blue" | "gray";
     InternalIcon?: Icon;
     InternalIconColor?: string;
+    weight?: "fill" | "regular"
 }
 
-export function Button({ title, type, InternalIcon, InternalIconColor = "white", ...rest }: Props) {
+export function Button({ title, type, InternalIcon, InternalIconColor = "white", weight = "regular", ...rest }: Props) {
     return (
         <NativeBaseButton
             h={10}
@@ -23,7 +24,7 @@ export function Button({ title, type, InternalIcon, InternalIconColor = "white",
             <HStack
                 alignItems="center"
             >
-                {InternalIcon && <InternalIcon size={16} color="white" weight="fill" />}
+                {InternalIcon && <InternalIcon size={16} color={InternalIconColor} weight={weight} />}
                 <Text
                     color={type === "gray" ? "gray.600" : type === "blue" ? "gray.100" : "gray.100"}
                     fontFamily="heading"

@@ -1,4 +1,4 @@
-import { Center, VStack, Text, Image, View, ScrollView } from "native-base";
+import { Center, VStack, Text, Image, View, ScrollView, Box } from "native-base";
 import Logo from "@assets/logo.png"
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
@@ -51,7 +51,7 @@ export function SignIn() {
                             Seu espaço de compra e venda
                         </Text>
                     </Center>
-                    <Center mt={50}>
+                    <Center mt={60}>
                         <Text fontSize="xs" color="gray.600">
                             Acesse sua conta
                         </Text>
@@ -82,24 +82,37 @@ export function SignIn() {
                                 />
                             )}
                         />
-                        <Button
-                            title="Entrar"
-                            type="blue"
+                        <Box
+                            width="100%"
+                            height={10}
+                            mt={4}
                             mb={12}
-                            onPress={handleSubmit(handleSignIn)}
-                        />
+                        >
+                            <Button
+                                title="Entrar"
+                                type="blue"
+                                onPress={handleSubmit(handleSignIn)}
+                            />
+                        </Box>
+
                     </Center>
                 </View>
                 <View py={12} px={12} bgColor="gray.100" >
                     <Center justifyContent="Center" bgColor="gray.100">
-                        <Text fontSize="2xs" color="gray.600" >
+                        <Text fontSize="xs" color="gray.600" >
                             Ainda não tem acesso?
                         </Text>
-                        <Button
-                            title="Criar uma conta"
-                            type="gray"
-                            onPress={handleCreateAccount}
-                        />
+                        <Box
+                            width="100%"
+                            height={10}
+                            mt={3}
+                        >
+                            <Button
+                                title="Criar uma conta"
+                                type="gray"
+                                onPress={handleCreateAccount}
+                            />
+                        </Box>
                     </Center>
                 </View>
             </VStack>

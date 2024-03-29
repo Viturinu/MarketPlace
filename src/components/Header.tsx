@@ -13,11 +13,13 @@ export function Header({ title, rightIcon, backIcon = false }: Props) {
     return (
         <SafeAreaView>
             <HStack
-                justifyContent="space-around"
+                justifyContent="space-between"
                 alignItems="center"
+                paddingX={4}
                 mt={5}
             >
-                <View>
+                <View
+                    ml={2}>
                     {backIcon ? <ArrowLeft /> : <View h={4} w={6} />}
                 </View>
                 <View>
@@ -29,7 +31,8 @@ export function Header({ title, rightIcon, backIcon = false }: Props) {
                         {title}
                     </Text>
                 </View>
-                <View>
+                <View
+                    mr={2}>
                     {rightIcon === "edit" ? <PencilSimpleLine /> : rightIcon === "plus" ? < Plus /> : <View h={4} w={6} />}
                 </View>
             </HStack>
