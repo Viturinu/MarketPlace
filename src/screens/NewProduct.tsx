@@ -1,16 +1,47 @@
 import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
-import { PaymentMethod } from "@components/PaymentMethod";
+import * as yup from "yup"
 import { Box, Checkbox, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
 import { Plus } from "phosphor-react-native";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { CustumTextArea } from "@components/CustumTextArea";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+type FormData = {
+    titulo: string;
+    descricao: string;
+    status: string;
+    valor: number;
+    troca: boolean;
+    pagamento: [];
+
+}
+
+const schema = yup.object({
+    titulo: yup.string().required("É necessário colocar um título para criar um registro"),
+    descricao: yup.string().required("É necessário colocar uma descrição para criar um registro"),
+    status: yup.string().required("É necessário dizer qual o status do produto"),
+    valor: yup.number().required("É necessário colocar um valor para o novo produto"),
+    troca: yup.boolean().required("É necessário dizer se poderá haver trocas"),
+})
+
+
 
 export function NewProduct() {
+
+    const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+        resolver: yupResolver(schema)
+    })
 
     const [newProduct, setNewProduct] = useState("new");
 
     const [paymentMethods, setPaymentMethods] = useState([]);
+
+    function handleNextStep() {
+        console.log("Entrou no avançar")
+    }
 
     return (
         <Box
@@ -66,21 +97,32 @@ export function NewProduct() {
                         >
                             Sobre o produto
                         </Text>
+                        <Controller
+                            control={control}
+                            name="titulo"
+                            render={({ field: { value, onChange } }) => (
+                                <Input
+                                    placeHolder="Título do anúncio"
+                                    value={value}
+                                    onChangeText={onChange}
+                                    errorMessage={errors.titulo?.message}
 
-                        <Input
-                            placeHolder="Título do anúncio"
+                                />
+                            )}
                         />
 
-                        <TextArea
-                            autoCompleteType={undefined}
-                            backgroundColor="gray.100"
-                            borderWidth={0}
-                            mt={4}
-                            placeholder="Descrição do produto"
-                            fontSize="md"
-                            minHeight={40}
+                        <Controller
+                            control={control}
+                            name="descricao"
+                            render={({ field: { value, onChange } }) => (
+                                <CustumTextArea
+                                    placeholder="Título do anúncio"
+                                    value={value}
+                                    onChangeText={onChange}
+                                    errorMessage={errors.descricao?.message}
+                                />
+                            )}
                         />
-
 
                         <Radio.Group
                             name="newProduct"
@@ -190,6 +232,7 @@ export function NewProduct() {
                                 weight="fill"
                                 ml={2}
                                 flex={1}
+                                onPress={handleSubmit(handleNextStep)}
                             />
                         </HStack>
                     </Box>
