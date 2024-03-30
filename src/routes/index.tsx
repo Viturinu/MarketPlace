@@ -7,6 +7,9 @@ import { SignUp } from "@screens/SingUp";
 import { ProductDetails } from "@screens/ProductDetails";
 import { MyProducts } from "@screens/MyProducts";
 import { ProductStatus } from "@screens/ProductStatus";
+import { ProductPreview } from "@screens/ProductPreview";
+import { NewProduct } from "@screens/NewProduct";
+import { EditProduct } from "@screens/EditProduct";
 
 export function Routes() {
 
@@ -18,7 +21,7 @@ export function Routes() {
     return (
         <Box flex={1}>
             <NavigationContainer theme={theme}>
-                <Home />
+                <EditProduct />
             </NavigationContainer>
         </Box>
     )

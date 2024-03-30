@@ -1,16 +1,20 @@
 import { CarouselPicture } from "@components/CarouselPicture";
 import { Header } from "@components/Header";
 import { ProfilePicture } from "@components/ProfilePicture";
-import { Box, HStack, View, Text, TextArea, VStack, ScrollView } from "native-base";
+import { Box, HStack, View, Text, TextArea, VStack, ScrollView, Center, useTheme } from "native-base";
 import { Dimensions } from "react-native";
 import Avatar from "@assets/avatar.png"
 import Carousel from 'react-native-reanimated-carousel';
 import { LittleButton } from "@components/LittleButton";
 import { PaymentMethod } from "@components/PaymentMethod";
 import { Button } from "@components/Button";
-import { WhatsappLogo } from "phosphor-react-native";
+import { ArrowLeft, Tag } from "phosphor-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 
-export function ProductDetails() {
+export function ProductPreview() {
+
+    const { colors } = useTheme();
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
@@ -27,8 +31,34 @@ export function ProductDetails() {
             backgroundColor="gray.200"
             flex={1}
         >
-            <Header backIcon />
-            <Box mt={2}>
+            <StatusBar
+                style='dark'
+                backgroundColor={colors.blue[100]}
+                translucent
+            />
+            <SafeAreaView>
+                <Center
+                    height={16}
+                    alignItems="center"
+                    backgroundColor="blue.100"
+                >
+                    <Text
+                        fontFamily="heading"
+                        color="gray.100"
+                        fontSize="sm"
+                    >
+                        Pré visualização do anúncio
+                    </Text>
+                    <Text
+                        fontFamily="body"
+                        color="gray.100"
+                        fontSize="xs"
+                    >
+                        É assim que seu produto vai aparecer
+                    </Text>
+                </Center>
+            </SafeAreaView>
+            <Box>
                 <Carousel
                     width={screenWidth}
                     height={screenHeight38}
@@ -131,31 +161,18 @@ export function ProductDetails() {
                     height={20}
                     backgroundColor="gray.100"
                 >
-                    <HStack
-                        alignItems="center"
+                    <Button
+                        title="Voltar e editar"
+                        type="gray"
+                        InternalIcon={ArrowLeft}
+                        weight="fill"
                         flex={0.5}
-                    >
-                        <Text
-                            fontSize="sm"
-                            fontFamily="heading"
-                            color="blue.100"
-                        >
-                            R$
-                        </Text>
-                        <Text
-                            fontSize="lg"
-                            fontFamily="heading"
-                            color="blue.100"
-                            ml={2}
-                        >
-                            120,00
-                        </Text>
-                    </HStack>
+                    />
 
                     <Button
-                        title="Entrar em contato"
+                        title="Publicar"
                         type="blue"
-                        InternalIcon={WhatsappLogo}
+                        InternalIcon={Tag}
                         weight="fill"
                         flex={0.5}
                     />

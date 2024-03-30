@@ -10,10 +10,11 @@ type Props = IInputProps & {
     senha?: boolean
     errorMessage?: string;
     search?: boolean;
+    money?: boolean;
     filterFunction?: () => void;
 }
 
-export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, filterFunction, ...rest }: Props) {
+export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, money = false, filterFunction, ...rest }: Props) {
 
     const { colors } = useTheme();
 
@@ -169,6 +170,11 @@ export function Input({ placeHolder, senha = false, isInvalid, errorMessage, sea
                 placeholder={placeHolder}
                 fontSize="md"
                 type={senha ? (show ? "text" : "password") : "text"}
+                keyboardType={money ? "numeric" : "default"}
+                InputLeftElement={
+                    money ?
+                        <Text ml={2}> R$ </Text>
+                        : <></>}
                 InputRightElement={senha ?
                     <Pressable onPress={() => setShow(!show)}>
                         <Icon as={<MaterialIcons name={show ? "visibility" : "visibility-off"} />} size={5} mr="2" color="muted.400" />

@@ -18,8 +18,7 @@ export function Header({ title, rightIcon, backIcon = false }: Props) {
                 paddingX={4}
                 mt={5}
             >
-                <View
-                    ml={2}>
+                <View>
                     {backIcon ? <ArrowLeft /> : <View h={4} w={6} />}
                 </View>
                 <View>
