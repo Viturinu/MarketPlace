@@ -1,4 +1,4 @@
-import { Center, ScrollView, View, Image, Text } from "native-base";
+import { Center, ScrollView, View, Image, Text, Toast, useToast } from "native-base";
 import Logo from "@assets/logo.png"
 import DefaultImage from "@assets/profileDefault.png"
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,6 +10,10 @@ import { AuthNavigationRoutesProps } from "@routes/auth.routes";
 import * as yup from "yup"
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system"
+import { useState } from "react";
+import { api } from "@services/api";
 
 type FormData = {
     nome: string;
@@ -32,12 +36,86 @@ export function SignUp() {
 
     const navigation = useNavigation<AuthNavigationRoutesProps>();
 
+    const toast = useToast();
+
+    const [userPhoto, setUserPhoto] = useState<ImagePicker.ImagePickerResult>();
+
+    async function handleUserPhotoSelect() {
+        try {
+            const userPhoto = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                aspect: [4, 4],
+                quality: 1,
+                allowsEditing: true
+            }); //aqui está a uri da foto editada, no browser do aparelho, com as configurações de corte e dimensões;
+
+            setUserPhoto(userPhoto);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: yupResolver(schema)
     })
 
-    function handleSignUp() {
-        console.log("Entrou no SignUp")
+    async function handleSignUp({ nome, email, telefone, senha }: FormData) {
+        try {
+
+            let userPhotoForm = new FormData();
+            if (userPhoto === undefined || userPhoto.canceled || userPhoto.assets[0].uri === "") {
+                return toast.show({
+                    title: "Você precisa inserir uma foto para fazer login",
+                    placement: "top",
+                    bgColor: "red.700"
+                })
+            }
+            if (userPhoto !== undefined) {
+                if (userPhoto.assets[0].uri) {
+                    const photoInfo = await FileSystem.getInfoAsync(userPhoto.assets[0].uri, { md5: true, size: true });
+
+                    if (photoInfo.exists && (photoInfo.size / 1024 / 1024) > 5) {
+                        return (
+                            toast.show({
+                                title: "A imagem selecionada é muito grande. Por favor, selecione imagem de tamanho menor que 5MB",
+                                placement: "top",
+                                bgColor: "red.700"
+                            })
+                        )
+                    }
+
+                    const photoExtension = userPhoto.assets[0].uri.split(".").pop(); //split na uri onde tem um ponto, e pop no ultimop elemento, no caso ficará a extensão
+
+                    const photoFile = {
+                        name: `${nome}.${photoExtension}`.toLowerCase(),
+                        uri: userPhoto.assets[0].uri,
+                        type: `${userPhoto.assets[0].type}/${photoExtension}`
+                    } as any; //tem que colocar any, exigência do FormData
+
+                    userPhotoForm.append("avatar", photoFile);
+                } //caso tenha foto
+            }
+            userPhotoForm.append("name", nome);
+            userPhotoForm.append("email", email);
+            userPhotoForm.append("tel", telefone);
+            userPhotoForm.append("password", senha);
+
+            console.log(JSON.stringify(userPhotoForm))
+
+            await api.post("/users", userPhotoForm, {
+                headers: {
+                    "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
+                }
+            });
+
+            toast.show({
+                title: "Usuário criado com sucesso.",
+                placement: "top",
+                bgColor: "green.500"
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     function handleGoBack() {
@@ -66,7 +144,9 @@ export function SignUp() {
                 </View>
                 <View px={10}>
                     <Center>
-                        <Pressable>
+                        <Pressable
+                            onPress={handleUserPhotoSelect}
+                        >
                             <Image
                                 source={DefaultImage}
                                 defaultSource={DefaultImage}
@@ -75,17 +155,20 @@ export function SignUp() {
                                 mt={4}
                             />
                         </Pressable>
+
                         <Controller
                             control={control}
                             name="nome"
                             render={({ field: { value, onChange } }) => (
-                                <Input
-                                    placeHolder="Nome"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    errorMessage={errors.nome?.message}
+                                <>
+                                    <Input
+                                        placeHolder="Nome"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        errorMessage={errors.nome?.message}
 
-                                />
+                                    />
+                                </>
                             )}
                         />
                         <Controller
@@ -107,7 +190,7 @@ export function SignUp() {
                             render={({ field: { value, onChange } }) => (
                                 <Input
                                     placeHolder="Telefone"
-                                    keyboardType="phone-pad"
+                                    keyboardType="numeric"
                                     value={value}
                                     onChangeText={onChange}
                                     errorMessage={errors.telefone?.message}

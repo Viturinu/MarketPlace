@@ -1,23 +1,24 @@
-import { TextArea, ITextAreaProps, FormControl } from "native-base";
+import { Input, IInputProps, FormControl } from "native-base";
 
-type Props = ITextAreaProps & {
+type Props = IInputProps & {
     errorMessage?: string;
 }
 
 export function CustumTextArea({ errorMessage, isInvalid, ...rest }: Props) {
 
     const invalid = !!errorMessage || isInvalid; //aqui setamos uma variável invalid baseado em msg de erro e invalid que o proprio yup passa pra Button, e aí jogamos no FormControl
-
+    console.log(errorMessage)
     return (
-        <FormControl>
-            <TextArea
-                autoCompleteType={undefined}
+        <FormControl isInvalid={invalid}>
+            <Input
+                textAlignVertical="top"
+                multiline
                 backgroundColor="gray.100"
                 borderWidth={0}
-                mt={4}
                 placeholder="Descrição do produto"
+                height={40}
+                mt={4}
                 fontSize="md"
-                minHeight={40}
                 _focus={{
                     borderWidth: 1,
                     borderColor: "green.700"

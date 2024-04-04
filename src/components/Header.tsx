@@ -1,6 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, PencilSimpleLine, Plus } from "phosphor-react-native"
 import { View, Text, HStack } from "native-base";
+import { TouchableOpacity } from "react-native";
 
 type Props = {
     title?: string;
@@ -18,9 +19,11 @@ export function Header({ title, rightIcon, backIcon = false }: Props) {
                 paddingX={4}
                 mt={5}
             >
-                <View>
-                    {backIcon ? <ArrowLeft /> : <View h={4} w={6} />}
-                </View>
+                <TouchableOpacity>
+                    <View>
+                        {backIcon ? <ArrowLeft /> : <View h={4} w={6} />}
+                    </View>
+                </TouchableOpacity>
                 <View>
                     <Text
                         color="gray.700"

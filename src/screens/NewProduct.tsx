@@ -2,18 +2,20 @@ import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
 import * as yup from "yup"
-import { Box, Checkbox, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
+import { Box, Checkbox, FormControl, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
 import { Plus } from "phosphor-react-native";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigation } from "@react-navigation/native";
+import { AuthNavigationRoutesProps } from "@routes/auth.routes";
+import { TouchableOpacity } from "react-native";
 
 type FormData = {
     titulo: string;
     descricao: string;
     status: string;
-    valor: number;
+    valor: string;
     troca: boolean;
     pagamento: [];
 
@@ -23,11 +25,8 @@ const schema = yup.object({
     titulo: yup.string().required("É necessário colocar um título para criar um registro"),
     descricao: yup.string().required("É necessário colocar uma descrição para criar um registro"),
     status: yup.string().required("É necessário dizer qual o status do produto"),
-    valor: yup.number().required("É necessário colocar um valor para o novo produto"),
-    troca: yup.boolean().required("É necessário dizer se poderá haver trocas"),
+    valor: yup.string().required("É necessário colocar um valor para o novo produto"),
 })
-
-
 
 export function NewProduct() {
 
@@ -35,12 +34,11 @@ export function NewProduct() {
         resolver: yupResolver(schema)
     })
 
-    const [newProduct, setNewProduct] = useState("new");
+    const navigation = useNavigation<AuthNavigationRoutesProps>();
 
-    const [paymentMethods, setPaymentMethods] = useState([]);
-
-    function handleNextStep() {
-        console.log("Entrou no avançar")
+    function handleNextStep({ titulo, descricao, status, valor, troca, pagamento }: FormData) {
+        console.log("Entrou no avançar");
+        console.log(titulo, descricao, status, valor, troca, pagamento);
     }
 
     return (
@@ -75,18 +73,19 @@ export function NewProduct() {
                             Escolha até 3 imagens para mostrar o quando o seu produto é incrível!
                         </Text>
                     </VStack>
-                    <Box
-                        width={100}
-                        height={100}
-                        backgroundColor="gray.300"
-                        borderRadius={6}
-                        alignItems="center"
-                        justifyContent="center"
-                        mt={4}
-                    >
-                        <Plus color="#9F9BA1" />
-                    </Box>
-
+                    <TouchableOpacity>
+                        <Box
+                            width={100}
+                            height={100}
+                            backgroundColor="gray.300"
+                            borderRadius={6}
+                            alignItems="center"
+                            justifyContent="center"
+                            mt={4}
+                        >
+                            <Plus color="#9F9BA1" />
+                        </Box>
+                    </TouchableOpacity>
                     <Box
                         mt={6}
                     >
@@ -115,33 +114,42 @@ export function NewProduct() {
                             control={control}
                             name="descricao"
                             render={({ field: { value, onChange } }) => (
+
                                 <CustumTextArea
-                                    placeholder="Título do anúncio"
+                                    placeholder="Descrição do produto"
                                     value={value}
                                     onChangeText={onChange}
                                     errorMessage={errors.descricao?.message}
                                 />
                             )}
                         />
+                        <Box
+                            backgroundColor="gray.200"
+                        >
+                            <Controller
+                                control={control}
+                                name="status"
+                                render={({ field: { value, onChange } }) => (
+                                    <Radio.Group
+                                        name="newProduct"
+                                        accessibilityLabel="newProduct"
+                                        value={value}
+                                        onChange={onChange}>
+                                        <HStack
+                                            mt={4}
+                                        >
+                                            <Radio value="new" my={1}>
+                                                <Text>Produto novo</Text>
+                                            </Radio>
+                                            <Radio value="used" my={1} ml={4}>
+                                                <Text>Produto usado</Text>
+                                            </Radio>
+                                        </HStack>
+                                    </Radio.Group>
+                                )}
+                            />
+                        </Box>
 
-                        <Radio.Group
-                            name="newProduct"
-                            accessibilityLabel="newProduct"
-                            value={newProduct}
-                            onChange={nextValue => {
-                                setNewProduct(nextValue);
-                            }}>
-                            <HStack
-                                mt={4}
-                            >
-                                <Radio value="new" my={1}>
-                                    <Text>Produto novo</Text>
-                                </Radio>
-                                <Radio value="used" my={1} ml={4}>
-                                    <Text>Produto usado</Text>
-                                </Radio>
-                            </HStack>
-                        </Radio.Group>
 
                         <VStack
                             mt={2}
@@ -154,8 +162,19 @@ export function NewProduct() {
                             >
                                 Venda
                             </Text>
+                            <Controller
+                                control={control}
+                                name="valor"
+                                render={({ field: { value, onChange } }) => (
+                                    <Input
+                                        placeHolder=""
+                                        value={value}
+                                        onChangeText={onChange}
+                                        errorMessage={errors.valor?.message}
+                                        money />
 
-                            <Input placeHolder={""} money={true} />
+                                )}
+                            />
                         </VStack>
 
                         <VStack
@@ -175,7 +194,16 @@ export function NewProduct() {
                                 h={6}
                                 mt={2}
                             >
-                                <Switch size="lg" />
+                                <Controller
+                                    control={control}
+                                    name="troca"
+                                    render={({ field: { value, onChange } }) => (
+                                        <Switch
+                                            size="lg"
+                                            value={value}
+                                            onValueChange={onChange} />
+                                    )}
+                                />
                             </HStack>
                         </VStack>
 
@@ -192,31 +220,37 @@ export function NewProduct() {
                             <Box
                                 mt={1}
                             >
-                                <Checkbox.Group
-                                    onChange={setPaymentMethods}
-                                    value={paymentMethods}
-                                    accessibilityLabel="choose payment methods">
-                                    <Checkbox value="boleto" my={1}>
-                                        <Text>Boleto</Text>
-                                    </Checkbox>
-                                    <Checkbox value="pix" my={1}>
-                                        <Text>Pix</Text>
-                                    </Checkbox>
-                                    <Checkbox value="dinheiro" my={1}>
-                                        <Text>Dinheiro</Text>
-                                    </Checkbox>
-                                    <Checkbox value="credito" my={1}>
-                                        <Text>Crédito</Text>
-                                    </Checkbox>
-                                    <Checkbox value="deposito" my={1}>
-                                        <Text>Depósito</Text>
-                                    </Checkbox>
-                                </Checkbox.Group>
+                                <Controller
+                                    control={control}
+                                    name="pagamento"
+                                    render={({ field: { value, onChange } }) => (
+                                        <Checkbox.Group
+                                            onChange={onChange}
+                                            value={value}
+                                            accessibilityLabel="choose payment methods">
+                                            <Checkbox value="boleto" my={1}>
+                                                <Text>Boleto</Text>
+                                            </Checkbox>
+                                            <Checkbox value="pix" my={1}>
+                                                <Text>Pix</Text>
+                                            </Checkbox>
+                                            <Checkbox value="dinheiro" my={1}>
+                                                <Text>Dinheiro</Text>
+                                            </Checkbox>
+                                            <Checkbox value="credito" my={1}>
+                                                <Text>Crédito</Text>
+                                            </Checkbox>
+                                            <Checkbox value="deposito" my={1}>
+                                                <Text>Depósito</Text>
+                                            </Checkbox>
+                                        </Checkbox.Group>
+                                    )}
+                                />
                             </Box>
                         </VStack>
 
                         <HStack
-                            height={40}
+                            height={12}
                             mt={6}
                         >
                             <Button
@@ -224,6 +258,7 @@ export function NewProduct() {
                                 type="gray"
                                 weight="fill"
                                 flex={1}
+                                onPress={() => navigation.goBack()}
                             />
 
                             <Button

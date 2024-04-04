@@ -66,8 +66,6 @@ export function Home() {
             padding={4}
             bgColor="gray.200"
             flex={1}
-            borderWidth={2}
-            borderColor="amber.700"
         >
             <SafeAreaView
                 style={{
