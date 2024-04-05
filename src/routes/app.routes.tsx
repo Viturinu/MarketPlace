@@ -1,17 +1,27 @@
-import { createBottomTabNavigator, BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
+import { createNativeStackNavigator, NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { EditProduct } from "@screens/EditProduct";
 import { Home } from "@screens/Home";
+import { MyProducts } from "@screens/MyProducts";
+import { NewProduct } from "@screens/NewProduct";
+import { ProductDetails } from "@screens/ProductDetails";
+import { ProductPreview } from "@screens/ProductPreview";
 import { useTheme } from "native-base";
 import { Platform } from "react-native";
+import { MyPProductsRoutes } from "./app.myproducts";
 
 type AppRoutes = {
     home: undefined;
-    products: undefined;
-    signOut: undefined;
+    myProducts: undefined;
+    newProduct: undefined;
+    productPreview: undefined;
+    productDetails: undefined;
+    editProduct: undefined;
+
 }
 
-const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>();
+const { Navigator, Screen } = createNativeStackNavigator<AppRoutes>();
 
-export type AppRoutesProps = BottomTabNavigationProp<AppRoutes>;
+export type AppRoutesProps = NativeStackNavigationProp<AppRoutes>;
 
 export function AppRoutes() {
 
@@ -19,23 +29,36 @@ export function AppRoutes() {
 
     return (
         <Navigator
+            initialRouteName="home"
             screenOptions={{
                 headerShown: false,
-                tabBarShowLabel: false,
-                tabBarStyle: {
-                    backgroundColor: colors.gray[100],
-                    borderTopWidth: 0,
-                    height: Platform.OS === "android" ? "auto" : 96,
-                    paddingBottom: sizes[10],
-                    paddingTop: sizes[6]
-                }
             }}
         >
             <Screen
                 name="home"
                 component={Home}
-
             />
+            <Screen
+                name="myProducts"
+                component={MyPProductsRoutes}
+            />
+            <Screen
+                name="newProduct"
+                component={NewProduct}
+            />
+            <Screen
+                name="productPreview"
+                component={ProductPreview}
+            />
+            <Screen
+                name="productDetails"
+                component={ProductDetails}
+            />
+            <Screen
+                name="editProduct"
+                component={EditProduct}
+            />
+
         </Navigator>
     )
 }

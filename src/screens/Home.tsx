@@ -7,9 +7,13 @@ import { Input } from "@components/Input";
 import { ProductCard } from "@components/ProductCard";
 import sha256 from 'crypto-js/sha256';
 import { ProfilePicture } from "@components/ProfilePicture";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
+import { AppRoutesProps } from "@routes/app.routes";
 
 export function Home() {
 
+    const navigation = useNavigation<AppRoutesProps>();
 
     const productList = [
         {
@@ -141,10 +145,8 @@ export function Home() {
                             </VStack>
                         </HStack>
 
-                        <Pressable
-                            _pressed={{
-                                backgroundColor: "gray.300"
-                            }}
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("myProducts")}
                         >
                             <HStack
                                 alignItems="center"
@@ -163,7 +165,7 @@ export function Home() {
 
                                 />
                             </HStack>
-                        </Pressable>
+                        </TouchableOpacity>
 
                     </HStack>
                     <View

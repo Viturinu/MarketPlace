@@ -7,9 +7,8 @@ import { Plus } from "phosphor-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation } from "@react-navigation/native";
-import { AuthNavigationRoutesProps } from "@routes/auth.routes";
 import { TouchableOpacity } from "react-native";
+import { AppRoutesProps } from "@routes/app.routes";
 
 type FormData = {
     titulo: string;
@@ -33,8 +32,6 @@ export function NewProduct() {
     const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: yupResolver(schema)
     })
-
-    const navigation = useNavigation<AuthNavigationRoutesProps>();
 
     function handleNextStep({ titulo, descricao, status, valor, troca, pagamento }: FormData) {
         console.log("Entrou no avançar");
@@ -258,7 +255,6 @@ export function NewProduct() {
                                 type="gray"
                                 weight="fill"
                                 flex={1}
-                                onPress={() => navigation.goBack()}
                             />
 
                             <Button
