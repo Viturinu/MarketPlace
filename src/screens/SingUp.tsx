@@ -12,8 +12,10 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system"
-import { useState } from "react";
+import MaskInput from 'react-native-mask-input';
+import React, { useState } from "react";
 import { api } from "@services/api";
+import { InputMask } from "@components/InputMask";
 
 type FormData = {
     nome: string;
@@ -188,8 +190,8 @@ export function SignUp() {
                             control={control}
                             name="telefone"
                             render={({ field: { value, onChange } }) => (
-                                <Input
-                                    placeHolder="Telefone"
+                                <InputMask
+                                    placeholder="Telefone"
                                     keyboardType="numeric"
                                     value={value}
                                     onChangeText={onChange}

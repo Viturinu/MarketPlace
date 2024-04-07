@@ -5,7 +5,9 @@ import { MyProducts } from "@screens/MyProducts";
 import { ProductDetails } from "@screens/ProductDetails";
 import { useTheme } from "native-base";
 import { House, SignOut, Tag } from "phosphor-react-native";
-import { Platform } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
+import { AppRoutes, AppRoutesProps } from "./app.routes";
+import { useNavigation } from "@react-navigation/native";
 
 type AppRoutes = {
     home: undefined;
@@ -21,7 +23,7 @@ export function MyPProductsRoutes() {
 
     const { sizes, colors } = useTheme(); //hooks precisam estar dentro de uma função (fora do return, a gente não tem acesso ao theme do nativebase, por isso precisamos desestruturar e chamar)
 
-    const { signOut } = useAuth();
+    const navigation = useNavigation<AppRoutesProps>()
 
     return (
         <Navigator
@@ -60,7 +62,7 @@ export function MyPProductsRoutes() {
             />
             <Screen
                 name="signOut"
-                component={ }
+                component={() => (navigation.goBack())}
                 options={{
                     tabBarIcon: () => (
                         <SignOut size={20} weight="bold" color={colors.red[300]} />
