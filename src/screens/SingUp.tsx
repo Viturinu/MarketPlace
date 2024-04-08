@@ -50,8 +50,9 @@ export function SignUp() {
                 allowsEditing: true
             }); //aqui está a uri da foto editada, no browser do aparelho, com as configurações de corte e dimensões;
 
+            if (userPhoto.canceled) return;
+
             setUserPhoto(userPhoto);
-            console.log(userPhoto.assets[0].uri)
         } catch (error) {
             console.log(error);
         }

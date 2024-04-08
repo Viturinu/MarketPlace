@@ -2,15 +2,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, PencilSimpleLine, Plus } from "phosphor-react-native"
 import { View, Text, HStack } from "native-base";
 import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 type Props = {
     title?: string;
     rightIcon?: "plus" | "edit";
+    rightIconFunction?: () => void;
     backIcon?: boolean;
 }
 
-export function Header({ title, rightIcon, backIcon = false }: Props) {
+export function Header({ title, rightIcon, rightIconFunction, backIcon = false }: Props) {
 
     return (
         <SafeAreaView>
@@ -34,10 +34,14 @@ export function Header({ title, rightIcon, backIcon = false }: Props) {
                         {title}
                     </Text>
                 </View>
-                <View
-                    mr={2}>
-                    {rightIcon === "edit" ? <PencilSimpleLine /> : rightIcon === "plus" ? < Plus /> : <View h={4} w={6} />}
-                </View>
+                <TouchableOpacity
+                    onPress={rightIconFunction}
+                >
+                    <View
+                        mr={2}>
+                        {rightIcon === "edit" ? <PencilSimpleLine /> : rightIcon === "plus" ? < Plus /> : <View h={4} w={6} />}
+                    </View>
+                </TouchableOpacity>
             </HStack>
         </SafeAreaView>
     )

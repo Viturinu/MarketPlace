@@ -8,7 +8,6 @@ import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableOpacity } from "react-native";
-import { AppRoutesProps } from "@routes/app.routes";
 
 type FormData = {
     titulo: string;

@@ -3,10 +3,14 @@ import { ProductCard } from "@components/ProductCard";
 import { Box, Text, HStack, Select, CheckIcon, FlatList, Center } from "native-base";
 import sha256 from 'crypto-js/sha256';
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { AppRoutesProps } from "@routes/app.routes";
 
 export function MyProducts() {
 
     const [service, setService] = useState("Todos");
+
+    const navigation = useNavigation<AppRoutesProps>();
 
     const productList = [
         {
@@ -65,6 +69,7 @@ export function MyProducts() {
             <Header
                 title="Meus anúncios"
                 rightIcon="plus"
+                rightIconFunction={() => navigation.navigate("navigateToProductsNavigation")}
             />
 
             <HStack
