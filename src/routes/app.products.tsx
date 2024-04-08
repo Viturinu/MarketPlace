@@ -33,7 +33,7 @@ export function ProductsRoutes() {
         >
             <Screen
                 name="create"
-                component={Home}
+                component={NewProduct}
             />
             <Screen
                 name="myProducts"

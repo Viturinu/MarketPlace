@@ -105,6 +105,7 @@ export function Home() {
                         title="Criar anúncio"
                         InternalIcon={Plus}
                         flex={0.4}
+                        onPress={() => navigation.navigate("navigateToProductsNavigation")}
                     />
                 </HStack>
 
