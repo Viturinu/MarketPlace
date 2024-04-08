@@ -2,6 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, PencilSimpleLine, Plus } from "phosphor-react-native"
 import { View, Text, HStack } from "native-base";
 import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 type Props = {
     title?: string;

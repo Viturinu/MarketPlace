@@ -1,8 +1,8 @@
-import { Center, ScrollView, View, Image, Text, Toast, useToast } from "native-base";
+import { Center, ScrollView, View, Image, Text, useToast } from "native-base";
 import Logo from "@assets/logo.png"
 import DefaultImage from "@assets/profileDefault.png"
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Pressable } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { useNavigation } from "@react-navigation/native";
@@ -12,10 +12,9 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system"
-import MaskInput from 'react-native-mask-input';
 import React, { useState } from "react";
 import { api } from "@services/api";
-import { InputMask } from "@components/InputMask";
+import { maskCep, maskPhone } from "@utils/masks";
 
 type FormData = {
     nome: string;
@@ -52,6 +51,7 @@ export function SignUp() {
             }); //aqui está a uri da foto editada, no browser do aparelho, com as configurações de corte e dimensões;
 
             setUserPhoto(userPhoto);
+            console.log(userPhoto.assets[0].uri)
         } catch (error) {
             console.log(error);
         }
@@ -146,17 +146,29 @@ export function SignUp() {
                 </View>
                 <View px={10}>
                     <Center>
-                        <Pressable
+                        <TouchableOpacity
                             onPress={handleUserPhotoSelect}
                         >
-                            <Image
-                                source={DefaultImage}
-                                defaultSource={DefaultImage}
-                                alt="Profile picture"
-                                mb={2}
-                                mt={4}
-                            />
-                        </Pressable>
+                            {
+                                userPhoto ?
+                                    <Image
+                                        source={{ uri: userPhoto.assets[0].uri }}
+                                        alt="Profile picture"
+                                        mb={2}
+                                        mt={4}
+                                        borderRadius={100}
+                                        width={100}
+                                        height={100}
+                                    /> : <Image
+                                        source={DefaultImage}
+                                        defaultSource={DefaultImage}
+                                        alt="Profile picture"
+                                        mb={2}
+                                        mt={4}
+                                    />
+                            }
+
+                        </TouchableOpacity>
 
                         <Controller
                             control={control}
@@ -190,11 +202,11 @@ export function SignUp() {
                             control={control}
                             name="telefone"
                             render={({ field: { value, onChange } }) => (
-                                <InputMask
-                                    placeholder="Telefone"
-                                    keyboardType="numeric"
+                                <Input
+                                    placeHolder="Telefone"
                                     value={value}
-                                    onChangeText={onChange}
+                                    onChangeText={value => onChange(maskPhone(value))}
+                                    maxLength={14}
                                     errorMessage={errors.telefone?.message}
                                 />
                             )}
