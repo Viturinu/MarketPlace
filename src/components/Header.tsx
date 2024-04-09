@@ -8,9 +8,10 @@ type Props = {
     rightIcon?: "plus" | "edit";
     rightIconFunction?: () => void;
     backIcon?: boolean;
+    backIconFunction?: () => void;
 }
 
-export function Header({ title, rightIcon, rightIconFunction, backIcon = false }: Props) {
+export function Header({ title, rightIcon, rightIconFunction, backIcon = false, backIconFunction }: Props) {
 
     return (
         <SafeAreaView>
@@ -20,11 +21,16 @@ export function Header({ title, rightIcon, rightIconFunction, backIcon = false }
                 paddingX={4}
                 mt={5}
             >
-                <TouchableOpacity>
-                    <View>
-                        {backIcon ? <ArrowLeft /> : <View h={4} w={6} />}
-                    </View>
-                </TouchableOpacity>
+
+                <View>
+                    {backIcon ?
+                        <TouchableOpacity
+                            onPress={backIconFunction}
+                        >
+                            <ArrowLeft />
+                        </TouchableOpacity> : <View h={4} w={6} />}
+                </View>
+
                 <View>
                     <Text
                         color="gray.700"

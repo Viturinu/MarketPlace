@@ -4,7 +4,7 @@ import { Box, Text, HStack, Select, CheckIcon, FlatList, Center } from "native-b
 import sha256 from 'crypto-js/sha256';
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { AppRoutesProps } from "@routes/app.routes";
+import { AppRoutesProps } from "@routes/app.routes.bottomtab";
 
 export function MyProducts() {
 

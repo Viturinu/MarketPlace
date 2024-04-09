@@ -10,7 +10,7 @@ type APIInstanceProps = AxiosInstance & {
 }
 
 export const api = axios.create({
-    baseURL: "http://10.10.10.5:3333"
+    baseURL: "http://10.0.0.103:3333"
 }) as APIInstanceProps;
 
 api.interceptor = (signOut) => { //essa função 'interceptor' tipada acima é apenas para podermos passar a função de SignOut no contexto, caso contrario aqui mesmo, sem a função interceptor, poderiamos fazer as tratativas de resposta

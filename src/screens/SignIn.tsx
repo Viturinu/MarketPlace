@@ -36,7 +36,6 @@ export function SignIn() {
 
     function handleSignIn({ email, senha }: FormDataProps) {
         signIn(email, senha);
-        console.log("Tentando entrar => " + email + " - " + senha);
     }
 
     return (

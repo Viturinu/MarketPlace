@@ -8,6 +8,8 @@ import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 
 type FormData = {
     titulo: string;
@@ -28,6 +30,8 @@ const schema = yup.object({
 
 export function NewProduct() {
 
+    const navigation = useNavigation<AppRoutesNativeStackProps>();
+
     const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: yupResolver(schema)
     })
@@ -45,6 +49,7 @@ export function NewProduct() {
             <Header
                 title="Criar anúncio"
                 backIcon
+                backIconFunction={() => navigation.goBack()}
             />
             <ScrollView
                 mt={4}>

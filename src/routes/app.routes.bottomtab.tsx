@@ -5,25 +5,25 @@ import { useTheme } from "native-base";
 import { House, SignOut, Tag } from "phosphor-react-native";
 import { Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { ProductsRoutes } from "./app.products";
+import { AppRoutesNativeStackProps } from "./app.routes.nativestack";
 import { ProductDetails } from "@screens/ProductDetails";
 
-type AppRoutes = {
+type AppRoutesBottomTab = {
     home: undefined;
     myproducts: undefined;
     signOut: undefined;
     navigateToProductsNavigation: undefined;
 }
 
-const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>();
+const { Navigator, Screen } = createBottomTabNavigator<AppRoutesBottomTab>();
 
-export type AppRoutesProps = BottomTabNavigationProp<AppRoutes>;
+export type AppRoutesBottomTabProps = BottomTabNavigationProp<AppRoutesBottomTab>;
 
-export function AppRoutes() {
+export function AppRoutesBottomTab() {
 
     const { sizes, colors } = useTheme(); //hooks precisam estar dentro de uma função (fora do return, a gente não tem acesso ao theme do nativebase, por isso precisamos desestruturar e chamar)
 
-    const navigation = useNavigation<AppRoutesProps>()
+    const navigation = useNavigation<AppRoutesNativeStackProps>()
 
     return (
         <Navigator
@@ -64,16 +64,11 @@ export function AppRoutes() {
                 name="signOut"
                 component={ProductDetails}
                 options={{
-                    tabBarIcon: () => (
-                        <SignOut size={20} weight="bold" color={colors.red[300]} />
+                    tabBarActiveTintColor: colors.red[700],
+                    tabBarInactiveTintColor: colors.red[300],
+                    tabBarIcon: ({ color }) => (
+                        <SignOut size={20} weight="bold" color={color} />
                     )
-                }}
-            />
-            <Screen
-                name="navigateToProductsNavigation"
-                component={ProductsRoutes}
-                options={{
-                    tabBarButton: () => null
                 }}
             />
         </Navigator>

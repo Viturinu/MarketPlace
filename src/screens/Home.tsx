@@ -1,4 +1,4 @@
-import { HStack, VStack, View, Text, Image, useTheme, Modal, FlatList, Flex, Pressable, Box, Row, Center } from "native-base";
+import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Avatar from "@assets/avatar.png"
 import { Button } from "@components/Button";
@@ -9,11 +9,14 @@ import sha256 from 'crypto-js/sha256';
 import { ProfilePicture } from "@components/ProfilePicture";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
-import { AppRoutesProps } from "@routes/app.routes";
+import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import { AppRoutesBottomTabProps } from "@routes/app.routes.bottomtab";
 
 export function Home() {
 
-    const navigation = useNavigation<AppRoutesProps>();
+    const navigationStack = useNavigation<AppRoutesNativeStackProps>();
+    const navigationBottomTab = useNavigation<AppRoutesBottomTabProps>();
+
 
     const productList = [
         {
@@ -105,7 +108,7 @@ export function Home() {
                         title="Criar anúncio"
                         InternalIcon={Plus}
                         flex={0.4}
-                        onPress={() => navigation.navigate("navigateToProductsNavigation")}
+                        onPress={() => navigationStack.navigate("newProduct")}
                     />
                 </HStack>
 
@@ -121,7 +124,7 @@ export function Home() {
                     </Text>
 
                     <TouchableOpacity
-                        onPress={() => navigation.navigate("myproducts")}
+                        onPress={() => navigationBottomTab.navigate("myproducts")}
                     >
                         <HStack
                             justifyContent="space-around"

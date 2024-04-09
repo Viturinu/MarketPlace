@@ -1,13 +1,14 @@
 import { createNativeStackNavigator, NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { EditProduct } from "@screens/EditProduct";
-import { Home } from "@screens/Home";
 import { NewProduct } from "@screens/NewProduct";
 import { ProductDetails } from "@screens/ProductDetails";
 import { ProductPreview } from "@screens/ProductPreview";
 import { useTheme } from "native-base";
+import { AppRoutesBottomTab } from "./app.routes.bottomtab";
+import { MyProducts } from "@screens/MyProducts";
 
-type ProductsRoutes = {
-    create: undefined;
+type AppRoutesNativeStack = {
+    BottomTabNavigator: undefined;
     myProducts: undefined;
     newProduct: undefined;
     productPreview: undefined;
@@ -16,28 +17,28 @@ type ProductsRoutes = {
 
 }
 
-const { Navigator, Screen } = createNativeStackNavigator<ProductsRoutes>();
+const { Navigator, Screen } = createNativeStackNavigator<AppRoutesNativeStack>();
 
-export type AppProductsProps = NativeStackNavigationProp<ProductsRoutes>;
+export type AppRoutesNativeStackProps = NativeStackNavigationProp<AppRoutesNativeStack>;
 
-export function ProductsRoutes() {
+export function AppRoutesNativeStack() {
 
     const { sizes, colors } = useTheme(); //hooks precisam estar dentro de uma função (fora do return, a gente não tem acesso ao theme do nativebase, por isso precisamos desestruturar e chamar)
 
     return (
         <Navigator
-            initialRouteName="create"
+            initialRouteName="BottomTabNavigator"
             screenOptions={{
                 headerShown: false,
             }}
         >
             <Screen
-                name="create"
-                component={NewProduct}
+                name="BottomTabNavigator"
+                component={AppRoutesBottomTab}
             />
             <Screen
                 name="myProducts"
-                component={NewProduct}
+                component={MyProducts}
             />
             <Screen
                 name="newProduct"

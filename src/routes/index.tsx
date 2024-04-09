@@ -3,7 +3,7 @@ import { Box, useTheme } from "native-base"
 import { AuthRoutes } from "./auth.routes";
 import { useAuth } from "@hooks/useAuth";
 import { Loading } from "@components/Loading";
-import { AppRoutes } from "./app.routes";
+import { AppRoutesNativeStack } from "./app.routes.nativestack";
 
 export function Routes() {
 
@@ -20,7 +20,7 @@ export function Routes() {
         <Box flex={1}>
 
             <NavigationContainer theme={theme}>
-                {user.id ? <AppRoutes /> : <AuthRoutes />}
+                {user.id ? <AppRoutesNativeStack /> : <AuthRoutes />}
             </NavigationContainer>
 
         </Box>
