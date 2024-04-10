@@ -11,10 +11,14 @@ import { Button } from "@components/Button";
 import { ArrowLeft, Tag } from "phosphor-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import { useNavigation } from "@react-navigation/native";
 
 export function ProductPreview() {
 
     const { colors } = useTheme();
+
+    const navigation = useNavigation<AppRoutesNativeStackProps>();
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
@@ -167,6 +171,7 @@ export function ProductPreview() {
                         InternalIcon={ArrowLeft}
                         weight="fill"
                         flex={0.5}
+                        onPress={() => navigation.goBack()}
                     />
 
                     <Button
@@ -175,6 +180,7 @@ export function ProductPreview() {
                         InternalIcon={Tag}
                         weight="fill"
                         flex={0.5}
+                        onPress={() => console.log("Publicou")}
                     />
                 </HStack>
             </ScrollView>

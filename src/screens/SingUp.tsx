@@ -12,9 +12,10 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system"
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { api } from "@services/api";
 import { maskCep, maskPhone } from "@utils/masks";
+import { useAuth } from "@hooks/useAuth";
 
 type FormData = {
     nome: string;
@@ -36,6 +37,8 @@ const schema = yup.object({
 export function SignUp() {
 
     const navigation = useNavigation<AuthNavigationRoutesProps>();
+
+    const { signIn } = useAuth();
 
     const toast = useToast();
 
@@ -103,8 +106,6 @@ export function SignUp() {
             userPhotoForm.append("tel", telefone);
             userPhotoForm.append("password", senha);
 
-            console.log(JSON.stringify(userPhotoForm))
-
             await api.post("/users", userPhotoForm, {
                 headers: {
                     "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
@@ -116,6 +117,8 @@ export function SignUp() {
                 placement: "top",
                 bgColor: "green.500"
             })
+
+            await signIn(email, senha);
         } catch (error) {
             console.log(error);
         }

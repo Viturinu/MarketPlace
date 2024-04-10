@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import { maskCurrency } from "@utils/masks";
 
 type FormData = {
     titulo: string;
@@ -76,19 +77,77 @@ export function NewProduct() {
                             Escolha até 3 imagens para mostrar o quando o seu produto é incrível!
                         </Text>
                     </VStack>
-                    <TouchableOpacity>
-                        <Box
-                            width={100}
-                            height={100}
-                            backgroundColor="gray.300"
-                            borderRadius={6}
-                            alignItems="center"
-                            justifyContent="center"
-                            mt={4}
+                    <Box>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
                         >
-                            <Plus color="#9F9BA1" />
-                        </Box>
-                    </TouchableOpacity>
+                            <HStack>
+                                <TouchableOpacity>
+                                    <Box
+                                        width={100}
+                                        height={100}
+                                        backgroundColor="gray.300"
+                                        borderRadius={6}
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        mt={4}
+                                        mr={2}
+                                    >
+                                        <Plus color="#9F9BA1" />
+                                    </Box>
+
+                                </TouchableOpacity>
+                                <TouchableOpacity>
+                                    <Box
+                                        width={100}
+                                        height={100}
+                                        backgroundColor="gray.300"
+                                        borderRadius={6}
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        mt={4}
+                                        mr={2}
+                                    >
+                                        <Plus color="#9F9BA1" />
+                                    </Box>
+
+                                </TouchableOpacity>
+                                <TouchableOpacity>
+                                    <Box
+                                        width={100}
+                                        height={100}
+                                        backgroundColor="gray.300"
+                                        borderRadius={6}
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        mt={4}
+                                        mr={2}
+                                    >
+                                        <Plus color="#9F9BA1" />
+                                    </Box>
+
+                                </TouchableOpacity>
+                                <TouchableOpacity>
+                                    <Box
+                                        width={100}
+                                        height={100}
+                                        backgroundColor="gray.300"
+                                        borderRadius={6}
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        mt={4}
+                                        mr={2}
+                                    >
+                                        <Plus color="#9F9BA1" />
+                                    </Box>
+
+                                </TouchableOpacity>
+                            </HStack>
+                        </ScrollView>
+                    </Box>
+
+
                     <Box
                         mt={6}
                     >
@@ -172,7 +231,8 @@ export function NewProduct() {
                                     <Input
                                         placeHolder=""
                                         value={value}
-                                        onChangeText={onChange}
+                                        onChangeText={value => onChange(maskCurrency(value))}
+
                                         errorMessage={errors.valor?.message}
                                         money />
 
