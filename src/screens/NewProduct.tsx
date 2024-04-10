@@ -2,7 +2,7 @@ import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
 import * as yup from "yup"
-import { Box, Checkbox, FormControl, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
+import { Box, Checkbox, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
 import { Plus } from "phosphor-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
@@ -39,6 +39,7 @@ export function NewProduct() {
     function handleNextStep({ titulo, descricao, status, valor, troca, pagamento }: FormData) {
         console.log("Entrou no avançar");
         console.log(titulo, descricao, status, valor, troca, pagamento);
+        navigation.navigate("productPreview");
     }
 
     return (
@@ -52,6 +53,7 @@ export function NewProduct() {
                 backIconFunction={() => navigation.goBack()}
             />
             <ScrollView
+                showsVerticalScrollIndicator={false}
                 mt={4}>
                 <Box
                     paddingX={4}
@@ -250,29 +252,32 @@ export function NewProduct() {
                             </Box>
                         </VStack>
 
-                        <HStack
-                            height={12}
-                            mt={6}
-                        >
-                            <Button
-                                title="Cancelar"
-                                type="gray"
-                                weight="fill"
-                                flex={1}
-                            />
 
-                            <Button
-                                title="Avançar"
-                                type="black"
-                                weight="fill"
-                                ml={2}
-                                flex={1}
-                                onPress={handleSubmit(handleNextStep)}
-                            />
-                        </HStack>
                     </Box>
                 </Box>
             </ScrollView>
+            <HStack
+                height={12}
+                mt={6}
+                paddingX={4}
+            >
+                <Button
+                    title="Cancelar"
+                    type="gray"
+                    weight="fill"
+                    flex={1}
+                    onPress={() => navigation.goBack()}
+                />
+
+                <Button
+                    title="Avançar"
+                    type="black"
+                    weight="fill"
+                    ml={2}
+                    flex={1}
+                    onPress={handleSubmit(handleNextStep)}
+                />
+            </HStack>
         </Box>
     )
 }

@@ -23,8 +23,6 @@ export function AppRoutesBottomTab() {
 
     const { sizes, colors } = useTheme(); //hooks precisam estar dentro de uma função (fora do return, a gente não tem acesso ao theme do nativebase, por isso precisamos desestruturar e chamar)
 
-    const navigation = useNavigation<AppRoutesNativeStackProps>()
-
     return (
         <Navigator
             initialRouteName="home"
@@ -46,6 +44,7 @@ export function AppRoutesBottomTab() {
                 name="home"
                 component={Home}
                 options={{
+
                     tabBarIcon: ({ color }) => (
                         <House size={20} weight="bold" color={color} />
                     ),
@@ -55,6 +54,7 @@ export function AppRoutesBottomTab() {
                 name="myproducts"
                 component={MyProducts}
                 options={{
+
                     tabBarIcon: ({ color }) => (
                         <Tag size={20} weight="bold" color={color} />
                     )
@@ -64,10 +64,8 @@ export function AppRoutesBottomTab() {
                 name="signOut"
                 component={ProductDetails}
                 options={{
-                    tabBarActiveTintColor: colors.red[700],
-                    tabBarInactiveTintColor: colors.red[300],
-                    tabBarIcon: ({ color }) => (
-                        <SignOut size={20} weight="bold" color={color} />
+                    tabBarIcon: ({ focused }) => (
+                        <SignOut size={20} weight="bold" color={focused ? colors.red[700] : colors.red[300]} />
                     )
                 }}
             />
