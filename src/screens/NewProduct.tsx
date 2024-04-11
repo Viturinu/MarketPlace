@@ -2,7 +2,7 @@ import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
 import * as yup from "yup"
-import { Box, Checkbox, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
+import { Box, Checkbox, FlatList, HStack, Radio, ScrollView, Switch, Text, useToast, Image, VStack } from "native-base";
 import { Plus } from "phosphor-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
@@ -10,16 +10,27 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system"
 import { maskCurrency } from "@utils/masks";
+import { useState } from "react";
+import { api } from "@services/api";
+import { useAuth } from "@hooks/useAuth";
+
+type pictureFileProps = {
+    name: string;
+    uri: string;
+    type: string;
+}
 
 type FormData = {
+    images: [];
     titulo: string;
     descricao: string;
     status: string;
     valor: string;
     troca: boolean;
     pagamento: [];
-
 }
 
 const schema = yup.object({
@@ -31,7 +42,17 @@ const schema = yup.object({
 
 export function NewProduct() {
 
+    let userPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
+
     const navigation = useNavigation<AppRoutesNativeStackProps>();
+
+    const { user } = useAuth();
+
+    const [pictureFiles, setPictureFiles] = useState<pictureFileProps[]>([]);
+
+    let increment = 0; //incrementar para as fotos
+
+    const toast = useToast();
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: yupResolver(schema)
@@ -41,6 +62,68 @@ export function NewProduct() {
         console.log("Entrou no avançar");
         console.log(titulo, descricao, status, valor, troca, pagamento);
         navigation.navigate("productPreview");
+    }
+
+    async function pickImage() {
+        try {
+            const userPhoto = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                aspect: [4, 4],
+                quality: 1,
+                allowsEditing: true
+            }); //aqui está a uri da foto editada, no browser do aparelho, com as configurações de corte e dimensões;
+
+            if (userPhoto.canceled) return;
+
+            if (userPhoto !== undefined) {
+                if (userPhoto.assets[0].uri) {
+                    const photoInfo = await FileSystem.getInfoAsync(userPhoto.assets[0].uri, { md5: true, size: true });
+
+                    if (photoInfo.exists && (photoInfo.size / 1024 / 1024) > 5) {
+                        return (
+                            toast.show({
+                                title: "A imagem selecionada é muito grande. Por favor, selecione imagem de tamanho menor que 5MB",
+                                placement: "top",
+                                bgColor: "red.700"
+                            })
+                        )
+                    }
+
+                    const photoExtension = userPhoto.assets[0].uri.split(".").pop(); //split na uri onde tem um ponto, e pop no ultimop elemento, no caso ficará a extensão
+
+                    increment = increment++;
+
+                    const pictureFile = {
+                        name: `${user.name}-${increment}.${photoExtension}`.toLowerCase(),
+                        uri: userPhoto.assets[0].uri,
+                        type: `${userPhoto.assets[0].type}/${photoExtension}`
+                    } as any; //tem que colocar any, exigência do FormData
+
+                    setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado
+
+                    console.log(JSON.stringify(pictureFiles));
+
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function uploadProduct({ images, titulo, descricao, pagamento, status, troca, valor }: FormData) {
+
+
+        await api.post("/users", userPhotoForm, {
+            headers: {
+                "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
+            }
+        });
+
+        toast.show({
+            title: "Usuário criado com sucesso.",
+            placement: "top",
+            bgColor: "green.500"
+        })
     }
 
     return (
@@ -78,75 +161,29 @@ export function NewProduct() {
                         </Text>
                     </VStack>
                     <Box>
-                        <ScrollView
+                        <FlatList
+                            data={[...pictureFiles, { isButton: true }]}
+                            keyExtractor={item => item.name}
+                            renderItem={({ item }) => {
+                                if (item.isButton)
+                                    <HStack>
+                                        <Image
+                                            source={{ uri: item.uri }}
+                                            alt="fotos do produto"
+                                            width={100}
+                                            height={100}
+                                            borderRadius={6}
+                                            mt={4}
+                                            mr={2}
+                                        />
+                                    </HStack>
+                            }
+                            }
+
                             horizontal
                             showsHorizontalScrollIndicator={false}
-                        >
-                            <HStack>
-                                <TouchableOpacity>
-                                    <Box
-                                        width={100}
-                                        height={100}
-                                        backgroundColor="gray.300"
-                                        borderRadius={6}
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        mt={4}
-                                        mr={2}
-                                    >
-                                        <Plus color="#9F9BA1" />
-                                    </Box>
-
-                                </TouchableOpacity>
-                                <TouchableOpacity>
-                                    <Box
-                                        width={100}
-                                        height={100}
-                                        backgroundColor="gray.300"
-                                        borderRadius={6}
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        mt={4}
-                                        mr={2}
-                                    >
-                                        <Plus color="#9F9BA1" />
-                                    </Box>
-
-                                </TouchableOpacity>
-                                <TouchableOpacity>
-                                    <Box
-                                        width={100}
-                                        height={100}
-                                        backgroundColor="gray.300"
-                                        borderRadius={6}
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        mt={4}
-                                        mr={2}
-                                    >
-                                        <Plus color="#9F9BA1" />
-                                    </Box>
-
-                                </TouchableOpacity>
-                                <TouchableOpacity>
-                                    <Box
-                                        width={100}
-                                        height={100}
-                                        backgroundColor="gray.300"
-                                        borderRadius={6}
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        mt={4}
-                                        mr={2}
-                                    >
-                                        <Plus color="#9F9BA1" />
-                                    </Box>
-
-                                </TouchableOpacity>
-                            </HStack>
-                        </ScrollView>
+                        />
                     </Box>
-
 
                     <Box
                         mt={6}

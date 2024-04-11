@@ -2,19 +2,19 @@ import { Center, ScrollView, View, Image, Text, useToast } from "native-base";
 import Logo from "@assets/logo.png"
 import DefaultImage from "@assets/profileDefault.png"
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Pressable, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigationRoutesProps } from "@routes/auth.routes";
-import * as yup from "yup"
+import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system"
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { api } from "@services/api";
-import { maskCep, maskPhone } from "@utils/masks";
+import { maskPhone } from "@utils/masks";
 import { useAuth } from "@hooks/useAuth";
 
 type FormData = {
