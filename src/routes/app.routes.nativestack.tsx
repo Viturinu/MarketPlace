@@ -6,12 +6,22 @@ import { ProductPreview } from "@screens/ProductPreview";
 import { useTheme } from "native-base";
 import { AppRoutesBottomTab } from "./app.routes.bottomtab";
 import { MyProducts } from "@screens/MyProducts";
+import { photoFileProps } from "@dtos/ProductDTO";
 
 type AppRoutesNativeStack = {
     BottomTabNavigator: undefined;
     myProducts: undefined;
     newProduct: undefined;
-    productPreview: undefined;
+    productPreview: {
+        images: photoFileProps[];
+        name: string;
+        description: string;
+        is_new: string;
+        price: string;
+        accept_trade: boolean;
+        payment_methods: [];
+
+    };
     productDetails: undefined;
     editProduct: undefined;
 

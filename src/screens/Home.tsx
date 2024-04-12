@@ -1,22 +1,29 @@
 import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Avatar from "@assets/avatar.png"
 import { Button } from "@components/Button";
 import { Plus, Tag, ArrowRight } from "phosphor-react-native";
 import { Input } from "@components/Input";
 import { ProductCard } from "@components/ProductCard";
-import sha256 from 'crypto-js/sha256';
 import { ProfilePicture } from "@components/ProfilePicture";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { AppRoutesBottomTabProps } from "@routes/app.routes.bottomtab";
+import { useAuth } from "@hooks/useAuth";
+import Avatar from "@assets/avatar.png"
+import { useEffect, useState } from "react";
+import { api } from "@services/api";
+import { ImageSourcePropType, ImageResolvedAssetSource } from "react-native";
+
 
 export function Home() {
 
     const navigationStack = useNavigation<AppRoutesNativeStackProps>();
     const navigationBottomTab = useNavigation<AppRoutesBottomTabProps>();
 
+    const [userImage, setUserImage] = useState<ImageSourcePropType>({} as ImageSourcePropType);
+
+    const { user } = useAuth();
 
     const productList = [
         {
@@ -68,6 +75,22 @@ export function Home() {
 
     const { colors } = useTheme();
 
+    async function loadUserImage() {
+        try {
+            const imageResponse = await api.get(`/images/${user.avatar}`);
+            const imageUrl = imageResponse.data._url;
+            console.log(JSON.stringify(imageResponse.data.responseURL))
+        } catch (error) {
+            setUserImage(Avatar);
+            console.log(error)
+        }
+
+    }
+
+    useEffect(() => {
+        loadUserImage();
+    }, [])
+
     return (
         <VStack
             padding={4}
@@ -90,7 +113,7 @@ export function Home() {
                     >
                         <ProfilePicture
                             size={11}
-                            uri={Avatar}
+                            uri={userImage}
                             borderColor="blue.100"
                         />
                         <VStack ml={2}>
@@ -98,7 +121,7 @@ export function Home() {
                                 Boas vindas,
                             </Text>
                             <Text fontFamily="heading">
-                                Maria!
+                                {user.name}!
                             </Text>
                         </VStack>
                     </HStack>
@@ -189,7 +212,7 @@ export function Home() {
                     <FlatList
                         data={productList}
                         numColumns={2}
-                        keyExtractor={item => sha256(item.nome + item.valor)}
+                        keyExtractor={item => item.nome + item.valor}
                         renderItem={({ item }) => (
                             <ProductCard
                                 nome={item.nome}

@@ -65,6 +65,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
             if (data.user && data.token && data.refresh_token) { //check se voltou os resultados de usuario, token e refresh_token de usuário
 
                 setIsLoadingUserStorageData(true);
+
                 await storageUserAndTokenSave(data.user, data.token, data.refresh_token); //salva os dados no AsyncStorage
                 await userAndTokenUpdate(data.user, data.token); //salva as variáveis nos estados
             }

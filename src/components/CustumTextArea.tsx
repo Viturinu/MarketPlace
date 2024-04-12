@@ -7,7 +7,6 @@ type Props = IInputProps & {
 export function CustumTextArea({ errorMessage, isInvalid, ...rest }: Props) {
 
     const invalid = !!errorMessage || isInvalid; //aqui setamos uma variável invalid baseado em msg de erro e invalid que o proprio yup passa pra Button, e aí jogamos no FormControl
-    console.log(errorMessage)
     return (
         <FormControl isInvalid={invalid}>
             <Input

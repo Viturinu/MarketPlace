@@ -2,7 +2,8 @@ import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
 import * as yup from "yup"
-import { Box, Checkbox, FlatList, HStack, Radio, ScrollView, Switch, Text, useToast, Image, VStack } from "native-base";
+import { Box, Checkbox, FlatList, HStack, ScrollView, Switch, Text, useToast, Image, VStack } from "native-base";
+import shortid from 'shortid';
 import { Plus } from "phosphor-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
@@ -16,41 +17,23 @@ import { maskCurrency } from "@utils/masks";
 import { useState } from "react";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
-
-type pictureFileProps = {
-    name: string;
-    uri: string;
-    type: string;
-}
-
-type FormData = {
-    images: [];
-    titulo: string;
-    descricao: string;
-    status: string;
-    valor: string;
-    troca: boolean;
-    pagamento: [];
-}
+import { RadioControlled } from "@components/RadioControlled";
+import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
 
 const schema = yup.object({
-    titulo: yup.string().required("É necessário colocar um título para criar um registro"),
-    descricao: yup.string().required("É necessário colocar uma descrição para criar um registro"),
-    status: yup.string().required("É necessário dizer qual o status do produto"),
-    valor: yup.string().required("É necessário colocar um valor para o novo produto"),
+    name: yup.string().required("É necessário colocar um título para criar um registro"),
+    description: yup.string().required("É necessário colocar uma descrição para criar um registro"),
+    is_new: yup.string().required("É necessário dizer qual o status do produto"),
+    price: yup.string().required("É necessário colocar um valor para o novo produto"),
 })
 
 export function NewProduct() {
-
-    let userPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
     const { user } = useAuth();
 
-    const [pictureFiles, setPictureFiles] = useState<pictureFileProps[]>([]);
-
-    let increment = 0; //incrementar para as fotos
+    const [pictureFiles, setPictureFiles] = useState<photoFileProps[]>([]);
 
     const toast = useToast();
 
@@ -58,14 +41,31 @@ export function NewProduct() {
         resolver: yupResolver(schema)
     })
 
-    function handleNextStep({ titulo, descricao, status, valor, troca, pagamento }: FormData) {
-        console.log("Entrou no avançar");
-        console.log(titulo, descricao, status, valor, troca, pagamento);
+    async function handleNextStep({ name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
+        if (pictureFiles.length === 0) {
+            return toast.show({
+                title: "Você precisa inserir pelo menos uma imagem do seu produto.",
+                placement: "top",
+                bgColor: "red.700"
+            })
+        }
+
         navigation.navigate("productPreview");
     }
 
     async function pickImage() {
         try {
+
+            if (pictureFiles.length === 4) {
+                return (
+                    toast.show({
+                        title: "Limite máximo de imagens alcançados",
+                        bgColor: "red.700",
+                        placement: "top"
+                    })
+                )
+            }
+
             const userPhoto = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 aspect: [4, 4],
@@ -91,39 +91,19 @@ export function NewProduct() {
 
                     const photoExtension = userPhoto.assets[0].uri.split(".").pop(); //split na uri onde tem um ponto, e pop no ultimop elemento, no caso ficará a extensão
 
-                    increment = increment++;
-
                     const pictureFile = {
-                        name: `${user.name}-${increment}.${photoExtension}`.toLowerCase(),
+                        id: shortid.generate(),
+                        name: `${user.name}.${photoExtension}`.toLowerCase(),
                         uri: userPhoto.assets[0].uri,
                         type: `${userPhoto.assets[0].type}/${photoExtension}`
                     } as any; //tem que colocar any, exigência do FormData
 
                     setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado
-
-                    console.log(JSON.stringify(pictureFiles));
-
                 }
             }
         } catch (error) {
             console.log(error);
         }
-    }
-
-    async function uploadProduct({ images, titulo, descricao, pagamento, status, troca, valor }: FormData) {
-
-
-        await api.post("/users", userPhotoForm, {
-            headers: {
-                "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
-            }
-        });
-
-        toast.show({
-            title: "Usuário criado com sucesso.",
-            placement: "top",
-            bgColor: "green.500"
-        })
     }
 
     return (
@@ -162,24 +142,75 @@ export function NewProduct() {
                     </VStack>
                     <Box>
                         <FlatList
-                            data={[...pictureFiles, { isButton: true }]}
-                            keyExtractor={item => item.name}
-                            renderItem={({ item }) => {
-                                if (item.isButton)
-                                    <HStack>
-                                        <Image
-                                            source={{ uri: item.uri }}
-                                            alt="fotos do produto"
-                                            width={100}
-                                            height={100}
-                                            borderRadius={6}
-                                            mt={4}
-                                            mr={2}
-                                        />
-                                    </HStack>
+                            data={pictureFiles}
+                            keyExtractor={item => `${item.id} - ${item.name}`}
+                            ListEmptyComponent={() =>
+                                <TouchableOpacity
+                                    onPress={pickImage}
+                                >
+                                    <Box
+                                        width={100}
+                                        height={100}
+                                        backgroundColor="gray.300"
+                                        borderRadius={6}
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        mt={4}
+                                        mr={2}
+                                    >
+                                        <Plus color="#9F9BA1" />
+                                    </Box>
+                                </TouchableOpacity>
                             }
-                            }
-
+                            renderItem={({ item, index }) => {
+                                // Verifica se este é o último item na lista
+                                if (index === pictureFiles.length - 1) {
+                                    return (
+                                        <HStack>
+                                            <Image
+                                                source={{ uri: item.uri }}
+                                                alt="fotos do produto"
+                                                width={100}
+                                                height={100}
+                                                borderRadius={6}
+                                                mt={4}
+                                                mr={2}
+                                            />
+                                            <TouchableOpacity
+                                                onPress={pickImage}
+                                            >
+                                                <Box
+                                                    width={100}
+                                                    height={100}
+                                                    backgroundColor="gray.300"
+                                                    borderRadius={6}
+                                                    alignItems="center"
+                                                    justifyContent="center"
+                                                    mt={4}
+                                                    mr={2}
+                                                >
+                                                    <Plus color="#9F9BA1" />
+                                                </Box>
+                                            </TouchableOpacity>
+                                        </HStack>
+                                    );
+                                } else {
+                                    // Renderiza os itens normais
+                                    return (
+                                        <HStack>
+                                            <Image
+                                                source={{ uri: item.uri }}
+                                                alt="fotos do produto"
+                                                width={100}
+                                                height={100}
+                                                borderRadius={6}
+                                                mt={4}
+                                                mr={2}
+                                            />
+                                        </HStack>
+                                    );
+                                }
+                            }}
                             horizontal
                             showsHorizontalScrollIndicator={false}
                         />
@@ -197,28 +228,27 @@ export function NewProduct() {
                         </Text>
                         <Controller
                             control={control}
-                            name="titulo"
+                            name="name"
                             render={({ field: { value, onChange } }) => (
                                 <Input
                                     placeHolder="Título do anúncio"
                                     value={value}
                                     onChangeText={onChange}
-                                    errorMessage={errors.titulo?.message}
-
+                                    errorMessage={errors.name?.message}
                                 />
                             )}
                         />
 
                         <Controller
                             control={control}
-                            name="descricao"
+                            name="description"
                             render={({ field: { value, onChange } }) => (
 
                                 <CustumTextArea
                                     placeholder="Descrição do produto"
                                     value={value}
                                     onChangeText={onChange}
-                                    errorMessage={errors.descricao?.message}
+                                    errorMessage={errors.description?.message}
                                 />
                             )}
                         />
@@ -227,29 +257,18 @@ export function NewProduct() {
                         >
                             <Controller
                                 control={control}
-                                name="status"
+                                name="is_new"
                                 render={({ field: { value, onChange } }) => (
-                                    <Radio.Group
-                                        name="newProduct"
-                                        accessibilityLabel="newProduct"
+                                    <RadioControlled
+                                        FirstProduct="Produto novo"
+                                        SecondProduct="Produto usado"
+                                        onChange={onChange}
                                         value={value}
-                                        onChange={onChange}>
-                                        <HStack
-                                            mt={4}
-                                        >
-                                            <Radio value="new" my={1}>
-                                                <Text>Produto novo</Text>
-                                            </Radio>
-                                            <Radio value="used" my={1} ml={4}>
-                                                <Text>Produto usado</Text>
-                                            </Radio>
-                                        </HStack>
-                                    </Radio.Group>
+                                        ErrorMessage={errors.is_new?.message}
+                                    />
                                 )}
                             />
                         </Box>
-
-
                         <VStack
                             mt={2}
                         >
@@ -263,14 +282,14 @@ export function NewProduct() {
                             </Text>
                             <Controller
                                 control={control}
-                                name="valor"
+                                name="price"
                                 render={({ field: { value, onChange } }) => (
                                     <Input
                                         placeHolder=""
                                         value={value}
                                         onChangeText={value => onChange(maskCurrency(value))}
 
-                                        errorMessage={errors.valor?.message}
+                                        errorMessage={errors.price?.message}
                                         money />
 
                                 )}
@@ -296,7 +315,7 @@ export function NewProduct() {
                             >
                                 <Controller
                                     control={control}
-                                    name="troca"
+                                    name="accept_trade"
                                     render={({ field: { value, onChange } }) => (
                                         <Switch
                                             size="lg"
@@ -322,7 +341,7 @@ export function NewProduct() {
                             >
                                 <Controller
                                     control={control}
-                                    name="pagamento"
+                                    name="payment_methods"
                                     render={({ field: { value, onChange } }) => (
                                         <Checkbox.Group
                                             onChange={onChange}

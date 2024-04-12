@@ -15,6 +15,7 @@ export function ProfilePicture({ uri, size, borderColor, ...rest }: Props) {
             rounded={9999}
             borderWidth={1}
             borderColor={borderColor}
+            {...rest}
         />
     )
 }

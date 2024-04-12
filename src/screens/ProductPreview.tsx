@@ -12,7 +12,10 @@ import { ArrowLeft, Tag } from "phosphor-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { productUploadProps } from "@dtos/ProductDTO";
+import { api } from "@services/api";
+import { useAuth } from "@hooks/useAuth";
 
 export function ProductPreview() {
 
@@ -20,15 +23,40 @@ export function ProductPreview() {
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
+    const { user } = useAuth();
+
+    const route = useRoute();
+
+    const { images, name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadProps; //recuperamos o id do exercicio
+
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
 
-    const images = [
-        "https://source.unsplash.com/1024x768/?nature",
-        "https://source.unsplash.com/1024x768/?water",
-        "https://source.unsplash.com/1024x768/?girl",
-        "https://source.unsplash.com/1024x768/?tree",
-    ];
+    async function uploadProduct({ images, name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
+
+        try {
+
+            let userPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
+            userPhotoForm.append("images", JSON.stringify(images)); //uploading imagens primeiro
+            await api.post("/products/images", userPhotoForm, {
+                headers: {
+                    "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
+                }
+            });
+
+            await api.post("/products", {
+                name,
+                description,
+                is_new,
+                price,
+                accept_trade,
+                payment_methods
+            })
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
 
     return (
         <Box
@@ -69,7 +97,7 @@ export function ProductPreview() {
                     data={images}
                     renderItem={({ item }) => {
                         return <CarouselPicture
-                            uri={item}
+                            uri={item.uri}
                             active={true}
                         />
                     }}
@@ -84,16 +112,34 @@ export function ProductPreview() {
                 >
 
 
-                    <HStack>
-                        <ProfilePicture size={6} uri={Avatar} borderColor="blue.100" />
+                    <HStack
+                        justifyContent="space-between"
+                    >
+                        <ProfilePicture size={6} uri={user.avatar} borderColor="blue.100" />
                         <Text
                             fontSize="sm"
                             fontFamily="heading"
                             color="gray.600"
                             ml={2}
                         >
-                            Makenna Baptista
+                            {user.name}
                         </Text>
+                        <HStack>
+                            <Text
+                                fontFamily="heading"
+                                fontSize="xl"
+                                color="blue.100"
+                            >
+                                R$
+                            </Text>
+                            <Text
+                                fontFamily="heading"
+                                fontSize="xl"
+                                color="blue.100"
+                            >
+                                {price}
+                            </Text>
+                        </HStack>
                     </HStack>
                     <Box
                         height={4}
@@ -116,7 +162,7 @@ export function ProductPreview() {
                             fontFamily="heading"
                             color="gray.700"
                         >
-                            Bicicleta
+                            {name}
                         </Text>
                         <HStack
                             alignItems="center"
@@ -127,7 +173,7 @@ export function ProductPreview() {
                     </HStack>
 
                     <Text fontSize="sm" color="gray.600" mt={2}>
-                        Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis in aliquam.
+                        {description}
                     </Text>
 
                     <HStack
@@ -137,7 +183,7 @@ export function ProductPreview() {
                             Aceita trocas?
                         </Text>
                         <Text fontFamily="body" color="gray.600" fontSize="sm" ml={2}>
-                            Sim
+                            {accept_trade ? "Sim" : "Não"}
                         </Text>
                     </HStack>
 
@@ -150,11 +196,12 @@ export function ProductPreview() {
                         <Box
                             mt={1}
                         >
-                            <PaymentMethod tipo="boleto" />
-                            <PaymentMethod tipo="credito" />
-                            <PaymentMethod tipo="deposito" />
-                            <PaymentMethod tipo="dinheiro" />
-                            <PaymentMethod tipo="pix" />
+                            {payment_methods.includes("boleto") && <PaymentMethod tipo="boleto" />}
+
+                            {payment_methods.includes("credito") && <PaymentMethod tipo="credito" />}
+                            {payment_methods.includes("deposito") && <PaymentMethod tipo="deposito" />}
+                            {payment_methods.includes("dinheiro") && <PaymentMethod tipo="dinheiro" />}
+                            {payment_methods.includes("pix") && <PaymentMethod tipo="pix" />}
                         </Box>
                     </VStack>
                 </Box>
