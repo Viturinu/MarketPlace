@@ -102,7 +102,7 @@ export function MyProducts() {
             <FlatList
                 data={productList}
                 numColumns={2}
-                keyExtractor={item => sha256(item.nome + item.valor)}
+                keyExtractor={item => item.nome + item.valor}
                 renderItem={({ item }) => (
                     <ProductCard
                         nome={item.nome}

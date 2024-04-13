@@ -1,6 +1,5 @@
 import { VStack, Image, Text, IPressableProps, HStack, View, Flex, Box } from "native-base";
 import { Pressable } from "react-native";
-import Avatar from "@assets/avatar.png"
 import { LittleButton } from "./LittleButton";
 import { ProfilePicture } from "./ProfilePicture";
 
@@ -8,10 +7,11 @@ type Props = IPressableProps & {
     nome?: string;
     valor?: string;
     uri?: string;
+    userUri?: string;
     profilePicture?: boolean;
 }
 
-export function ProductCard({ nome, valor, uri, profilePicture = true, ...rest }: Props) {
+export function ProductCard({ nome, valor, uri, profilePicture = true, userUri, ...rest }: Props) {
     return (
         <Pressable
             {...rest}
@@ -30,7 +30,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, ...rest }
 
                             <ProfilePicture
                                 size={6}
-                                uri={Avatar}
+                                uri={userUri}
                                 borderColor="gray.100"
                                 mt={1}
                                 ml={1}

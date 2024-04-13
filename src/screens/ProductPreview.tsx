@@ -29,6 +29,8 @@ export function ProductPreview() {
 
     const { images, name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadProps; //recuperamos o id do exercicio
 
+    console.log(JSON.stringify(images))
+
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
 
@@ -115,7 +117,7 @@ export function ProductPreview() {
                     <HStack
                         justifyContent="space-between"
                     >
-                        <ProfilePicture size={6} uri={user.avatar} borderColor="blue.100" />
+                        <ProfilePicture size={6} uri={`${api.defaults.baseURL}/images/${user.avatar}`} borderColor="blue.100" />
                         <Text
                             fontSize="sm"
                             fontFamily="heading"

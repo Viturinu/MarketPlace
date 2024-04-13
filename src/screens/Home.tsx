@@ -1,4 +1,4 @@
-import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center } from "native-base";
+import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Image } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@components/Button";
 import { Plus, Tag, ArrowRight } from "phosphor-react-native";
@@ -21,7 +21,7 @@ export function Home() {
     const navigationStack = useNavigation<AppRoutesNativeStackProps>();
     const navigationBottomTab = useNavigation<AppRoutesBottomTabProps>();
 
-    const [userImage, setUserImage] = useState<ImageSourcePropType>({} as ImageSourcePropType);
+    const [userImage, setUserImage] = useState();
 
     const { user } = useAuth();
 
@@ -77,14 +77,17 @@ export function Home() {
 
     async function loadUserImage() {
         try {
+            // Faça sua chamada à API para obter a imagem
             const imageResponse = await api.get(`/images/${user.avatar}`);
-            const imageUrl = imageResponse.data._url;
-            console.log(JSON.stringify(imageResponse.data.responseURL))
-        } catch (error) {
-            setUserImage(Avatar);
-            console.log(error)
-        }
+            setUserImage(imageResponse.data);
+            console.log(`${api.defaults.baseURL}/images/${user.avatar}`)
+            //console.log(userImage)
+            //setUserImage(imageResponse.data);
 
+        } catch (error) {
+            // Se ocorrer um erro ao fazer a chamada à API, trate o erro
+            console.log('Erro ao fazer a chamada à API');
+        }
     }
 
     useEffect(() => {
@@ -113,7 +116,7 @@ export function Home() {
                     >
                         <ProfilePicture
                             size={11}
-                            uri={userImage}
+                            uri={`${api.defaults.baseURL}/images/${user.avatar}`}
                             borderColor="blue.100"
                         />
                         <VStack ml={2}>
@@ -218,6 +221,7 @@ export function Home() {
                                 nome={item.nome}
                                 valor={item.valor}
                                 uri={item.uri}
+                                userUri={`${api.defaults.baseURL}/images/${user.avatar}`}
                                 flex={0.5}
                                 marginTop={12}
                                 margin={6}

@@ -13,6 +13,7 @@ type AppRoutesNativeStack = {
     myProducts: undefined;
     newProduct: undefined;
     productPreview: {
+        id: string;
         images: photoFileProps[];
         name: string;
         description: string;

@@ -9,12 +9,16 @@ import { LittleButton } from "@components/LittleButton";
 import { PaymentMethod } from "@components/PaymentMethod";
 import { Button } from "@components/Button";
 import { Power, Trash } from "phosphor-react-native";
+import { api } from "@services/api";
+import { useAuth } from "@hooks/useAuth";
 
 type Props = {
     active: boolean;
 }
 
 export function ProductStatus({ active }: Props) {
+
+    const { user } = useAuth();
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight40 = ((Dimensions.get('window').height) * 0.35);
@@ -55,7 +59,7 @@ export function ProductStatus({ active }: Props) {
 
 
                     <HStack>
-                        <ProfilePicture size={6} uri={Avatar} borderColor="blue.100" />
+                        <ProfilePicture size={6} uri={`${api.defaults.baseURL}/images/${user.avatar}`} borderColor="blue.100" />
                         <Text
                             fontSize="sm"
                             fontFamily="heading"

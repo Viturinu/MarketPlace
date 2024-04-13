@@ -15,10 +15,11 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system"
 import { maskCurrency } from "@utils/masks";
 import { useState } from "react";
-import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { RadioControlled } from "@components/RadioControlled";
 import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
+import { api } from "@services/api";
+import { unmaskCurrency } from "@utils/unmasks";
 
 const schema = yup.object({
     name: yup.string().required("É necessário colocar um título para criar um registro"),
@@ -33,30 +34,18 @@ export function NewProduct() {
 
     const { user } = useAuth();
 
-    const [pictureFiles, setPictureFiles] = useState<photoFileProps[]>([]);
-
     const toast = useToast();
 
-    const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const [pictureFiles, setPictureFiles] = useState<photoFileProps[]>([]);
+
+    const { control, handleSubmit, formState: { errors } } = useForm<productUploadProps>({
         resolver: yupResolver(schema)
     })
-
-    async function handleNextStep({ name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
-        if (pictureFiles.length === 0) {
-            return toast.show({
-                title: "Você precisa inserir pelo menos uma imagem do seu produto.",
-                placement: "top",
-                bgColor: "red.700"
-            })
-        }
-
-        navigation.navigate("productPreview");
-    }
 
     async function pickImage() {
         try {
 
-            if (pictureFiles.length === 4) {
+            if (pictureFiles.length === 4) { //chegou em 4 fotos? Para!
                 return (
                     toast.show({
                         title: "Limite máximo de imagens alcançados",
@@ -93,17 +82,71 @@ export function NewProduct() {
 
                     const pictureFile = {
                         id: shortid.generate(),
-                        name: `${user.name}.${photoExtension}`.toLowerCase(),
+                        name: `${user.name}-${userPhoto.assets[0].fileName}.${photoExtension}`.toLowerCase(),
                         uri: userPhoto.assets[0].uri,
                         type: `${userPhoto.assets[0].type}/${photoExtension}`
                     } as any; //tem que colocar any, exigência do FormData
 
-                    setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado
+                    setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado com imagens pra fazer o upload
                 }
             }
         } catch (error) {
             console.log(error);
         }
+    }
+
+    async function handleNextStep({ name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
+        try {
+
+            if (pictureFiles.length === 0) {
+                return toast.show({
+                    title: "Você precisa inserir pelo menos uma imagem do seu produto.",
+                    placement: "top",
+                    bgColor: "red.700"
+                })
+            }
+
+            const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
+            const accept_trade_defining = accept_trade === undefined ? false : true;
+
+            const formResponse = await api.post("/products", {
+                name,
+                description,
+                is_new: is_new_boolean,
+                price: Number(unmaskCurrency(price)),
+                accept_trade: accept_trade_defining,
+                payment_methods
+            })
+
+
+            let productPhotoForm = new FormData(); //multiform
+
+            productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
+            productPhotoForm.append("images", JSON.stringify(pictureFiles));
+
+
+            const picturesResponse = await api.post("/products/image", productPhotoForm, {
+                headers: {
+                    "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
+                }
+            });
+
+            console.log(picturesResponse);
+
+            navigation.navigate("productPreview"), {
+                id: formResponse.data.id,
+                images: pictureFiles,
+                name,
+                description,
+                is_new: is_new_boolean,
+                price,
+                accept_trade: accept_trade_defining,
+                payment_methods
+            };
+        } catch (error) {
+            console.log(JSON.stringify(error) + " - Aqui no upload do produto");
+        }
+
     }
 
     return (
@@ -353,13 +396,13 @@ export function NewProduct() {
                                             <Checkbox value="pix" my={1}>
                                                 <Text>Pix</Text>
                                             </Checkbox>
-                                            <Checkbox value="dinheiro" my={1}>
+                                            <Checkbox value="cash" my={1}>
                                                 <Text>Dinheiro</Text>
                                             </Checkbox>
-                                            <Checkbox value="credito" my={1}>
+                                            <Checkbox value="card" my={1}>
                                                 <Text>Crédito</Text>
                                             </Checkbox>
-                                            <Checkbox value="deposito" my={1}>
+                                            <Checkbox value="deposit" my={1}>
                                                 <Text>Depósito</Text>
                                             </Checkbox>
                                         </Checkbox.Group>
