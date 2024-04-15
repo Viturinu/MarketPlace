@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { productUploadProps } from "@dtos/ProductDTO";
+import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { unmaskCurrency } from "@utils/unmasks";
@@ -50,8 +50,19 @@ export function ProductPreview() {
 
             let productPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
 
+            const product_id = formResponse.data.id;
+
+            console.log("PRODUCT ID - " + product_id)
+
             productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
-            productPhotoForm.append("images", images as any); //uploading imagens primeiro
+
+            images.forEach((image, index) => {
+
+                productPhotoForm.append(`images[${index}]`, {
+                    images: image.uri,
+                    type: image.type
+                } as any);
+            });
 
             await api.post("/products/images", productPhotoForm, {
                 headers: {
@@ -65,11 +76,17 @@ export function ProductPreview() {
                 bgColor: "green.700"
             })
         } catch (error) {
+            console.error('Erro ao enviar dados para a API:', error);
+
+            // Verificar se o erro é uma instância de Error e se possui uma propriedade 'message'
+            const errorMessage = error instanceof Error && error.message ? error.message : 'Erro desconhecido';
+
+            // Exibir mensagem de erro no Toast
             return toast.show({
-                title: error.message,
+                title: errorMessage,
                 placement: "top",
                 bgColor: "red.700"
-            })
+            });
         }
     }
 
