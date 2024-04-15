@@ -2,9 +2,9 @@ import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
 import * as yup from "yup"
-import { Box, Checkbox, FlatList, HStack, ScrollView, Switch, Text, useToast, Image, VStack } from "native-base";
+import { Box, Checkbox, FlatList, HStack, ScrollView, Switch, Text, useToast, Image, VStack, Icon, useTheme, View } from "native-base";
 import shortid from 'shortid';
-import { Plus } from "phosphor-react-native";
+import { Plus, X } from "phosphor-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,8 +18,6 @@ import { useState } from "react";
 import { useAuth } from "@hooks/useAuth";
 import { RadioControlled } from "@components/RadioControlled";
 import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
-import { api } from "@services/api";
-import { unmaskCurrency } from "@utils/unmasks";
 
 const schema = yup.object({
     name: yup.string().required("É necessário colocar um título para criar um registro"),
@@ -33,6 +31,8 @@ export function NewProduct() {
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
     const { user } = useAuth();
+
+    const { colors } = useTheme();
 
     const toast = useToast();
 
@@ -95,6 +95,11 @@ export function NewProduct() {
         }
     }
 
+    function removeProductPicture(productPicture: photoFileProps) {
+        const newArray = pictureFiles.filter(item => item.id !== productPicture.id);
+        setPictureFiles(newArray);
+    }
+
     async function handleNextStep({ name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
         try {
 
@@ -106,47 +111,19 @@ export function NewProduct() {
                 })
             }
 
-            const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
-            const accept_trade_defining = accept_trade === undefined ? false : true;
-
-            const formResponse = await api.post("/products", {
-                name,
-                description,
-                is_new: is_new_boolean,
-                price: Number(unmaskCurrency(price)),
-                accept_trade: accept_trade_defining,
-                payment_methods
-            })
-
-
-            let productPhotoForm = new FormData(); //multiform
-
-            productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
-            productPhotoForm.append("images", JSON.stringify(pictureFiles));
-
-
-            const picturesResponse = await api.post("/products/image", productPhotoForm, {
-                headers: {
-                    "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
-                }
-            });
-
-            console.log(picturesResponse);
-
-            navigation.navigate("productPreview"), {
-                id: formResponse.data.id,
+            navigation.navigate("productPreview", {
                 images: pictureFiles,
                 name,
                 description,
-                is_new: is_new_boolean,
+                is_new,
                 price,
-                accept_trade: accept_trade_defining,
+                accept_trade,
                 payment_methods
-            };
+            });
+
         } catch (error) {
             console.log(JSON.stringify(error) + " - Aqui no upload do produto");
         }
-
     }
 
     return (
@@ -210,15 +187,44 @@ export function NewProduct() {
                                 if (index === pictureFiles.length - 1) {
                                     return (
                                         <HStack>
-                                            <Image
-                                                source={{ uri: item.uri }}
-                                                alt="fotos do produto"
+                                            <HStack
                                                 width={100}
                                                 height={100}
+                                                justifyContent="flex-end"
                                                 borderRadius={6}
                                                 mt={4}
                                                 mr={2}
-                                            />
+                                            >
+                                                <View
+                                                    zIndex={1}>
+                                                    <TouchableOpacity
+                                                        onPress={() => removeProductPicture(item)}
+                                                    >
+                                                        <Box
+                                                            width={4}
+                                                            height={4}
+                                                            mt={1}
+                                                            mr={1}
+                                                            backgroundColor="gray.600"
+                                                            borderRadius={100}
+                                                            justifyContent="center"
+                                                            alignItems="center"
+                                                            zIndex={1}
+                                                        >
+                                                            <X size={12} color={colors.gray[400]} />
+                                                        </Box>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <Image
+                                                    source={{ uri: item.uri }}
+                                                    alt={"foto do produto - " + index}
+                                                    height="100%"
+                                                    width="100%"
+                                                    position="absolute"
+                                                />
+
+                                            </HStack>
+
                                             <TouchableOpacity
                                                 onPress={pickImage}
                                             >
@@ -240,17 +246,44 @@ export function NewProduct() {
                                 } else {
                                     // Renderiza os itens normais
                                     return (
-                                        <HStack>
+
+                                        <HStack
+                                            width={100}
+                                            height={100}
+                                            justifyContent="flex-end"
+                                            borderRadius={6}
+                                            mt={4}
+                                            mr={2}
+                                        >
+                                            <View
+                                                zIndex={1}
+                                            >
+                                                <TouchableOpacity
+                                                    onPress={() => removeProductPicture(item)}
+                                                >
+                                                    <Box
+                                                        width={4}
+                                                        height={4}
+                                                        mt={1}
+                                                        mr={1}
+                                                        backgroundColor="gray.600"
+                                                        borderRadius={100}
+                                                        justifyContent="center"
+                                                        alignItems="center"
+                                                    >
+                                                        <X size={12} color={colors.gray[400]} />
+                                                    </Box>
+                                                </TouchableOpacity>
+                                            </View>
                                             <Image
                                                 source={{ uri: item.uri }}
-                                                alt="fotos do produto"
-                                                width={100}
-                                                height={100}
-                                                borderRadius={6}
-                                                mt={4}
-                                                mr={2}
+                                                alt={"foto do produto - " + index}
+                                                height="100%"
+                                                width="100%"
+                                                position="absolute"
                                             />
                                         </HStack>
+
                                     );
                                 }
                             }}

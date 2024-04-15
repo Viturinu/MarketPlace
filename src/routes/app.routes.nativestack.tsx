@@ -13,15 +13,13 @@ type AppRoutesNativeStack = {
     myProducts: undefined;
     newProduct: undefined;
     productPreview: {
-        id: string;
         images: photoFileProps[];
         name: string;
         description: string;
         is_new: string;
         price: string;
         accept_trade: boolean;
-        payment_methods: [];
-
+        payment_methods: string[];
     };
     productDetails: undefined;
     editProduct: undefined;

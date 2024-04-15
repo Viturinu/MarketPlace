@@ -1,9 +1,7 @@
 import { CarouselPicture } from "@components/CarouselPicture";
-import { Header } from "@components/Header";
 import { ProfilePicture } from "@components/ProfilePicture";
-import { Box, HStack, View, Text, TextArea, VStack, ScrollView, Center, useTheme } from "native-base";
+import { Box, HStack, View, Text, TextArea, VStack, ScrollView, Center, useTheme, useToast } from "native-base";
 import { Dimensions } from "react-native";
-import Avatar from "@assets/avatar.png"
 import Carousel from 'react-native-reanimated-carousel';
 import { LittleButton } from "@components/LittleButton";
 import { PaymentMethod } from "@components/PaymentMethod";
@@ -16,10 +14,13 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { productUploadProps } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
+import { unmaskCurrency } from "@utils/unmasks";
 
 export function ProductPreview() {
 
     const { colors } = useTheme();
+
+    const toast = useToast();
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
@@ -27,37 +28,49 @@ export function ProductPreview() {
 
     const route = useRoute();
 
-    const { images, name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadProps; //recuperamos o id do exercicio
-
-    console.log(JSON.stringify(images))
+    const { images = [], name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadProps;
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
 
-    async function uploadProduct({ images, name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
-
+    async function handleNextStep() {
         try {
 
-            let userPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
-            userPhotoForm.append("images", JSON.stringify(images)); //uploading imagens primeiro
-            await api.post("/products/images", userPhotoForm, {
+            const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
+            const accept_trade_defining = accept_trade === undefined ? false : true;//necessário, pois por default value vem undefined
+
+            const formResponse = await api.post("/products", {
+                name,
+                description,
+                is_new: is_new_boolean,
+                price: Number(unmaskCurrency(price)),
+                accept_trade: accept_trade_defining,
+                payment_methods
+            })
+
+            let productPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
+
+            productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
+            productPhotoForm.append("images", images as any); //uploading imagens primeiro
+
+            await api.post("/products/images", productPhotoForm, {
                 headers: {
                     "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
                 }
             });
 
-            await api.post("/products", {
-                name,
-                description,
-                is_new,
-                price,
-                accept_trade,
-                payment_methods
+            toast.show({
+                title: "Seu produto foi adicionado ao Market Place",
+                placement: "top",
+                bgColor: "green.700"
             })
         } catch (error) {
-            console.log(error);
+            return toast.show({
+                title: error.message,
+                placement: "top",
+                bgColor: "red.700"
+            })
         }
-
     }
 
     return (
@@ -112,11 +125,7 @@ export function ProductPreview() {
                     paddingX={4}
                     mb={5}
                 >
-
-
-                    <HStack
-                        justifyContent="space-between"
-                    >
+                    <HStack>
                         <ProfilePicture size={6} uri={`${api.defaults.baseURL}/images/${user.avatar}`} borderColor="blue.100" />
                         <Text
                             fontSize="sm"
@@ -126,23 +135,8 @@ export function ProductPreview() {
                         >
                             {user.name}
                         </Text>
-                        <HStack>
-                            <Text
-                                fontFamily="heading"
-                                fontSize="xl"
-                                color="blue.100"
-                            >
-                                R$
-                            </Text>
-                            <Text
-                                fontFamily="heading"
-                                fontSize="xl"
-                                color="blue.100"
-                            >
-                                {price}
-                            </Text>
-                        </HStack>
                     </HStack>
+
                     <Box
                         height={4}
                         width={12}
@@ -150,8 +144,9 @@ export function ProductPreview() {
                     >
                         <LittleButton
                             fontSize="2xs"
-                            color="gray.600"
-                            title="novo"
+                            background="gray.600"
+                            color={is_new === "new" ? "blue.100" : "gray.600"}
+                            title={is_new === "new" ? "novo" : "usado"}
                             backgroundColor="gray.300"
                         />
                     </Box>
@@ -170,7 +165,7 @@ export function ProductPreview() {
                             alignItems="center"
                         >
                             <Text color="blue.100" fontSize="sm" fontFamily="heading">R$</Text>
-                            <Text color="blue.100" fontSize="lg" fontFamily="heading" ml={1}>120,00</Text>
+                            <Text color="blue.100" fontSize="lg" fontFamily="heading" ml={1}>{price}</Text>
                         </HStack>
                     </HStack>
 
@@ -200,39 +195,42 @@ export function ProductPreview() {
                         >
                             {payment_methods.includes("boleto") && <PaymentMethod tipo="boleto" />}
 
-                            {payment_methods.includes("credito") && <PaymentMethod tipo="credito" />}
-                            {payment_methods.includes("deposito") && <PaymentMethod tipo="deposito" />}
-                            {payment_methods.includes("dinheiro") && <PaymentMethod tipo="dinheiro" />}
+                            {payment_methods.includes("card") && <PaymentMethod tipo="credito" />}
+                            {payment_methods.includes("deposit") && <PaymentMethod tipo="deposito" />}
+                            {payment_methods.includes("cash") && <PaymentMethod tipo="dinheiro" />}
                             {payment_methods.includes("pix") && <PaymentMethod tipo="pix" />}
                         </Box>
                     </VStack>
                 </Box>
-                <HStack
-                    paddingX={4}
-                    alignItems="center"
-                    justifyContent="space-between"
-                    height={20}
-                    backgroundColor="gray.100"
-                >
-                    <Button
-                        title="Voltar e editar"
-                        type="gray"
-                        InternalIcon={ArrowLeft}
-                        weight="fill"
-                        flex={0.5}
-                        onPress={() => navigation.goBack()}
-                    />
 
-                    <Button
-                        title="Publicar"
-                        type="blue"
-                        InternalIcon={Tag}
-                        weight="fill"
-                        flex={0.5}
-                        onPress={() => console.log("Publicou")}
-                    />
-                </HStack>
             </ScrollView>
+
+            <HStack
+                paddingX={4}
+                alignItems="center"
+                justifyContent="space-between"
+                height={20}
+                backgroundColor="gray.100"
+            >
+                <Button
+                    title="Voltar e editar"
+                    type="gray"
+                    InternalIcon={ArrowLeft}
+                    InternalIconColor="black"
+                    flex={0.5}
+                    onPress={() => navigation.goBack()}
+                />
+
+                <Button
+                    title="Publicar"
+                    type="blue"
+                    InternalIcon={Tag}
+                    weight="regular"
+                    flex={0.5}
+                    onPress={handleNextStep}
+                />
+            </HStack>
+
         </Box >
     )
 }

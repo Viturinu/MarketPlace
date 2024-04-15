@@ -6,11 +6,10 @@ type Props = IBoxProps & {
     fontSize: string;
 }
 
-export function LittleButton({ title, backgroundColor, color, fontSize, ...rest }: Props) {
+export function LittleButton({ title, color, fontSize, ...rest }: Props) {
     return (
         <Box
             flex={1}
-            backgroundColor={backgroundColor}
             alignItems="center"
             justifyContent="center"
             rounded={9999}
