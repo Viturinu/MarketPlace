@@ -11,10 +11,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
+import { productUploadProps } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { unmaskCurrency } from "@utils/unmasks";
+import { useState } from "react";
+import { AppRoutesBottomTabProps } from "@routes/app.routes.bottomtab";
 
 export function ProductPreview() {
 
@@ -30,11 +32,15 @@ export function ProductPreview() {
 
     const { images = [], name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadProps;
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
 
-    async function handleNextStep() {
+    async function handlePublishProduct() {
         try {
+
+            setIsLoading(true);
 
             const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
             const accept_trade_defining = accept_trade === undefined ? false : true;//necessário, pois por default value vem undefined
@@ -52,14 +58,14 @@ export function ProductPreview() {
 
             const product_id = formResponse.data.id;
 
-            console.log("PRODUCT ID - " + product_id)
-
             productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
 
-            images.forEach((image, index) => {
+            //productPhotoForm.append("images", images as any);
 
-                productPhotoForm.append(`images[${index}]`, {
-                    images: image.uri,
+            images.forEach((image) => {
+                productPhotoForm.append('images', {
+                    uri: image.uri,
+                    name: image.name,
                     type: image.type
                 } as any);
             });
@@ -75,6 +81,10 @@ export function ProductPreview() {
                 placement: "top",
                 bgColor: "green.700"
             })
+
+            setTimeout(() => {
+                navigation.navigate("BottomTabNavigator");
+            }, 2000);
         } catch (error) {
             console.error('Erro ao enviar dados para a API:', error);
 
@@ -127,6 +137,7 @@ export function ProductPreview() {
                     width={screenWidth}
                     height={screenHeight38}
                     data={images}
+                    loop={false}
                     renderItem={({ item }) => {
                         return <CarouselPicture
                             uri={item.uri}
@@ -231,20 +242,23 @@ export function ProductPreview() {
             >
                 <Button
                     title="Voltar e editar"
+                    isLoading={isLoading}
                     type="gray"
                     InternalIcon={ArrowLeft}
                     InternalIconColor="black"
-                    flex={0.5}
+                    flex={1}
                     onPress={() => navigation.goBack()}
                 />
 
                 <Button
                     title="Publicar"
+                    isLoading={isLoading}
                     type="blue"
                     InternalIcon={Tag}
                     weight="regular"
-                    flex={0.5}
-                    onPress={handleNextStep}
+                    ml={2}
+                    flex={1}
+                    onPress={handlePublishProduct}
                 />
             </HStack>
 

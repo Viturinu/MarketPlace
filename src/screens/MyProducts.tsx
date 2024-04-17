@@ -2,15 +2,19 @@ import { Header } from "@components/Header";
 import { ProductCard } from "@components/ProductCard";
 import { Box, Text, HStack, Select, CheckIcon, FlatList, Center } from "native-base";
 import sha256 from 'crypto-js/sha256';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { AppRoutesProps } from "@routes/app.routes.bottomtab";
+import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import { api } from "@services/api";
+import { productsProps } from "@dtos/ProductDTO";
 
 export function MyProducts() {
 
     const [service, setService] = useState("Todos");
 
-    const navigation = useNavigation<AppRoutesProps>();
+    const [productArray, setProductArray] = useState<productsProps[]>({} as productsProps[]);
+
+    const navigation = useNavigation<AppRoutesNativeStackProps>();
 
     const productList = [
         {
@@ -60,6 +64,20 @@ export function MyProducts() {
         },
     ]
 
+    async function updateMyProducts() {
+        try {
+            const productArray = await api.get("/users/products");
+            setProductArray(productArray.data);
+            console.log(JSON.stringify(productArray));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        updateMyProducts();
+    }, [])
+
     return (
         <Box
             backgroundColor="gray.200"
@@ -69,7 +87,7 @@ export function MyProducts() {
             <Header
                 title="Meus anúncios"
                 rightIcon="plus"
-                rightIconFunction={() => navigation.navigate("navigateToProductsNavigation")}
+                rightIconFunction={() => navigation.navigate("newProduct")}
             />
 
             <HStack
@@ -100,14 +118,14 @@ export function MyProducts() {
             </HStack>
 
             <FlatList
-                data={productList}
+                data={productArray}
                 numColumns={2}
-                keyExtractor={item => item.nome + item.valor}
+                keyExtractor={(item, index) => item.name + item.price + " - " + index}
                 renderItem={({ item }) => (
                     <ProductCard
-                        nome={item.nome}
-                        valor={item.valor}
-                        uri={item.uri}
+                        nome={item.name}
+                        valor={item.price}
+                        uri={item.product_images[1].path}
                         flex={0.5}
                         marginTop={12}
                         margin={6}

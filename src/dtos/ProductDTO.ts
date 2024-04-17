@@ -14,3 +14,28 @@ export type productUploadProps = {
     accept_trade: boolean;
     payment_methods: string[];
 }
+
+export type product_image_props = {
+    path: string;
+    id: string;
+}
+
+export type payment_method_props = {
+    key: string;
+    name: string;
+}
+
+export type productsProps = {
+    id: string;
+    name: string;
+    description: string;
+    is_new: boolean;
+    price: string;
+    accept_trade: boolean;
+    user_id: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    product_images: product_image_props[];
+    payment_methods: payment_method_props[];
+}

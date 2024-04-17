@@ -6,7 +6,7 @@ import { ProfilePicture } from "./ProfilePicture";
 type Props = IPressableProps & {
     nome?: string;
     valor?: string;
-    uri?: string;
+    uri: string;
     userUri?: string;
     profilePicture?: boolean;
 }
