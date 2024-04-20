@@ -64,15 +64,15 @@ export function Input({ placeHolder, senha = false, isInvalid, errorMessage, sea
                                 mt={2}
                             >
                                 <LittleButton
-                                    title="Novo"
+                                    type="modalBlue"
+                                    title="novo"
                                     backgroundColor="blue.100"
                                     color="gray.100"
                                     fontSize="xs"
                                 />
                                 <LittleButton
-                                    title="Novo"
-                                    backgroundColor="gray.300"
-                                    color="gray.400"
+                                    type="modalGray"
+                                    title="usado"
                                     ml={2}
                                     fontSize="xs"
                                 />

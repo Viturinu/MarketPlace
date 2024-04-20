@@ -6,14 +6,14 @@ import { Input } from "@components/Input";
 import { ProductCard } from "@components/ProductCard";
 import { ProfilePicture } from "@components/ProfilePicture";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { AppRoutesBottomTabProps } from "@routes/app.routes.bottomtab";
 import { useAuth } from "@hooks/useAuth";
-import Avatar from "@assets/avatar.png"
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { api } from "@services/api";
-import { ImageSourcePropType, ImageResolvedAssetSource } from "react-native";
+import { productsProps } from "@dtos/ProductDTO";
+import { maskCurrency } from "@utils/masks";
 
 
 export function Home() {
@@ -21,66 +21,26 @@ export function Home() {
     const navigationStack = useNavigation<AppRoutesNativeStackProps>();
     const navigationBottomTab = useNavigation<AppRoutesBottomTabProps>();
 
-    const [userImage, setUserImage] = useState();
+    const [productsArray, setProductsArray] = useState<productsProps[]>([] as productsProps[]);
+    const [myProductsArray, setMyProductsArray] = useState<productsProps[]>([] as productsProps[]);
 
     const { user } = useAuth();
 
-    const productList = [
-        {
-            nome: "Tênis azul",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis vermelho",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis amarelo",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis rosa",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis vinho",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis preto",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis azul marinho",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis verde água",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis azul pscina",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-    ]
-
     const { colors } = useTheme();
 
-    async function loadUserImage() {
+    async function loadUserImageAndAnnounces() {
         try {
             // Faça sua chamada à API para obter a imagem
-            const imageResponse = await api.get(`/images/${user.avatar}`);
-            setUserImage(imageResponse.data);
-            console.log(`${api.defaults.baseURL}/images/${user.avatar}`)
+            const arrayProducts = await api.get("/products");
+            setProductsArray(arrayProducts.data);
+
+            const productsArrayWithOwnerPicture = productsArray.map(item => {
+
+            })
+
+            const myProductsArray = await api.get("/users/products");
+            setMyProductsArray(myProductsArray.data);
+            //console.log(`${api.defaults.baseURL}/images/${user.avatar}`)
             //console.log(userImage)
             //setUserImage(imageResponse.data);
 
@@ -90,9 +50,9 @@ export function Home() {
         }
     }
 
-    useEffect(() => {
-        loadUserImage();
-    }, [])
+    useFocusEffect(useCallback(() => {
+        loadUserImageAndAnnounces();
+    }, []))
 
     return (
         <VStack
@@ -171,7 +131,7 @@ export function Home() {
                                         fontFamily="heading"
                                         fontSize="lg"
                                     >
-                                        4
+                                        {myProductsArray.length}
                                     </Text>
                                     <Text fontFamily="body" fontSize="xs">
                                         anúncios ativos
@@ -213,15 +173,15 @@ export function Home() {
                     </View>
 
                     <FlatList
-                        data={productList}
+                        data={productsArray}
                         numColumns={2}
-                        keyExtractor={item => item.nome + item.valor}
+                        keyExtractor={item => item.name + item.price}
                         renderItem={({ item }) => (
                             <ProductCard
-                                nome={item.nome}
-                                valor={item.valor}
-                                uri={item.uri}
-                                userUri={`${api.defaults.baseURL}/images/${user.avatar}`}
+                                nome={item.name}
+                                valor={maskCurrency(String(item.price))}
+                                uri={item.product_images[0].path}
+                                userUri={user.avatar}
                                 flex={0.5}
                                 marginTop={12}
                                 margin={6}
@@ -232,10 +192,9 @@ export function Home() {
                         }}
                         contentContainerStyle={[
                             {
-                                paddingBottom: 80,
-
+                                paddingBottom: 30,
                             },
-                            productList.length === 0 && { flex: 1 },
+                            productsArray.length === 0 && { flex: 1 },
                         ]}
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={() => (

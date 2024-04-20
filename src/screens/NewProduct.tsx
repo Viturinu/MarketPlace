@@ -81,7 +81,7 @@ export function NewProduct() {
                     const photoExtension = userPhoto.assets[0].uri.split(".").pop(); //split na uri onde tem um ponto, e pop no ultimop elemento, no caso ficará a extensão
 
                     const pictureFile = {
-                        id: shortid.generate(),
+                        id: shortid.generate(), //gerando um id unico pra cada foto
                         name: `${user.name}-${userPhoto.assets[0].fileName}.${photoExtension}`.toLowerCase(),
                         uri: userPhoto.assets[0].uri,
                         type: `${userPhoto.assets[0].type}/${photoExtension}`

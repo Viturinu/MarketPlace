@@ -1,77 +1,28 @@
 import { Header } from "@components/Header";
 import { ProductCard } from "@components/ProductCard";
-import { Box, Text, HStack, Select, CheckIcon, FlatList, Center } from "native-base";
-import sha256 from 'crypto-js/sha256';
-import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { Box, Text, HStack, Select, CheckIcon, FlatList, Center, Image } from "native-base";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { api } from "@services/api";
 import { productsProps } from "@dtos/ProductDTO";
+import { maskCurrency } from "@utils/masks";
 
 export function MyProducts() {
 
     const [service, setService] = useState("Todos");
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [productArray, setProductArray] = useState<productsProps[]>([] as productsProps[]);
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
-
-    const productList = [
-        {
-            nome: "Tênis azul",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis vermelho",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis amarelo",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis rosa",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis vinho",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis preto",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis azul marinho",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis verde água",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-        {
-            nome: "Tênis azul pscina",
-            valor: "59,90",
-            uri: "https://cdn.awsli.com.br/2500x2500/209/209769/produto/44794689/9121372ae1.jpg"
-        },
-    ]
 
     async function updateMyProducts() {
         try {
             setIsLoading(true);
             const productArray = await api.get("/users/products");
             setProductArray(productArray.data);
-            console.log("É este console.log" + JSON.stringify(productArray));
         } catch (error) {
             console.log(error);
         }
@@ -80,9 +31,9 @@ export function MyProducts() {
         }
     }
 
-    useEffect(() => {
+    useFocusEffect(useCallback(() => {
         updateMyProducts();
-    }, [])
+    }, []))
 
     return (
         <Box
@@ -107,7 +58,7 @@ export function MyProducts() {
                     color="gray.600"
                     ml={2}
                 >
-                    9 anúncios
+                    {productArray.length} anúncios
                 </Text>
                 <Box>
                     <Select selectedValue={service} width={110} height={8} accessibilityLabel="Todos" placeholderTextColor="gray.600" placeholder="Todos" _selectedItem={{
@@ -123,15 +74,17 @@ export function MyProducts() {
                 </Box>
             </HStack>
             {
-                isLoading && <FlatList
+                !isLoading && <FlatList
                     data={productArray}
                     numColumns={2}
                     keyExtractor={(item, index) => item.name + item.price + " - " + index}
                     renderItem={({ item }) => (
                         <ProductCard
+                            status={item.is_new ? "novo" : "usado"}
                             nome={item.name}
-                            valor={item.price}
-                            uri={item.product_images[1].path}
+                            isActive={item.is_active}
+                            valor={maskCurrency(String(item.price))}
+                            uri={item.product_images[0].path}
                             flex={0.5}
                             marginTop={12}
                             margin={6}
@@ -146,7 +99,7 @@ export function MyProducts() {
                             paddingBottom: 80,
 
                         },
-                        productList.length === 0 && { flex: 1 },
+                        productArray.length === 0 && { flex: 1 },
                     ]}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={() => (

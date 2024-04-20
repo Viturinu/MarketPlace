@@ -16,8 +16,8 @@ export type productUploadProps = {
 }
 
 export type product_image_props = {
-    path: string;
     id: string;
+    path: string;
 }
 
 export type payment_method_props = {
@@ -30,7 +30,7 @@ export type productsProps = {
     name: string;
     description: string;
     is_new: boolean;
-    price: string;
+    price: number;
     accept_trade: boolean;
     user_id: string;
     is_active: boolean;
@@ -38,4 +38,5 @@ export type productsProps = {
     updated_at: string;
     product_images: product_image_props[];
     payment_methods: payment_method_props[];
+    ownerPicture: string;
 }
