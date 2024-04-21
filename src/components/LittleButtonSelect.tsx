@@ -1,13 +1,13 @@
-import { Box, HStack, Text } from "native-base";
+import { Box, HStack, Text, IZStackProps } from "native-base";
 import { X } from "phosphor-react-native";
 
-type Props = {
+type Props = IZStackProps & {
     type: "modalBlue" | "modalGray";
     fontSize: string;
     isSelected: boolean;
 }
 
-export function LittleButtonSelect({ type, fontSize, isSelected }: Props) {
+export function LittleButtonSelect({ type, fontSize, isSelected, ...rest }: Props) {
     return (
 
         <HStack
@@ -17,6 +17,7 @@ export function LittleButtonSelect({ type, fontSize, isSelected }: Props) {
             rounded={100}
             height={8}
             width={20}
+            {...rest}
         >
             <Text
                 color={type === "modalBlue" ? "gray.100" : "gray.500"}
