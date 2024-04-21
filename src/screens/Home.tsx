@@ -1,4 +1,4 @@
-import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Image, Modal, Switch, Checkbox } from "native-base";
+import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Modal, Switch, Checkbox } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@components/Button";
 import { Plus, Tag, ArrowRight } from "phosphor-react-native";
@@ -16,6 +16,7 @@ import { productsProps } from "@dtos/ProductDTO";
 import { maskCurrency } from "@utils/masks";
 import { LittleButton } from "@components/LittleButton";
 import { LittleButtonSelect } from "@components/LittleButtonSelect";
+import { boolean } from "yup";
 
 
 export function Home() {
@@ -56,6 +57,11 @@ export function Home() {
             // Se ocorrer um erro ao fazer a chamada à API, trate o erro
             console.log('Erro ao fazer a chamada à API');
         }
+    }
+
+    function handleSetIsNew(isNew: boolean) {
+        setIsNew(isNew);
+        console.log("Mudou pra: " + isNew);
     }
 
     useFocusEffect(useCallback(() => {
@@ -107,27 +113,25 @@ export function Home() {
                                 </Text>
 
                                 <HStack
-                                    w="50%"
-                                    h={6}
+                                    flex={1}
                                     mt={2}
                                 >
                                     <TouchableOpacity
-                                        onPress={() => setIsNew(true)}
+                                        onPress={() => handleSetIsNew(true)}
                                     >
                                         <LittleButtonSelect
                                             type="modalBlue"
                                             isSelected={isNew}
-                                            fontSize="xs"
+                                            fontSize="sm"
                                         />
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => setIsNew(false)}
+                                        onPress={() => handleSetIsNew(false)}
                                     >
                                         <LittleButtonSelect
                                             type="modalGray"
                                             isSelected={!isNew}
-                                            ml={2}
-                                            fontSize="xs"
+                                            fontSize="sm"
                                         />
                                     </TouchableOpacity>
                                 </HStack>
@@ -189,136 +193,6 @@ export function Home() {
                                             Depósito Bancário
                                         </Checkbox>
                                     </Checkbox.Group>
-                                </VStack>
-                            </VStack>
-
-                            <HStack
-                                mt={6}
-                            >
-                                <Button
-                                    flex={1}
-                                    onPress={() => {
-                                        setShowModal(false);
-                                    }}
-                                    title="Resetar filtros"
-                                    type="gray"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    flex={1}
-                                    ml={2}
-                                    onPress={() => {
-                                        setShowModal(false);
-                                    }}
-                                    title="Aplicar filtros"
-                                    type="black"
-                                >
-                                    Save
-                                </Button>
-                            </HStack>
-                        </Modal.Body>
-                    </Modal.Content>
-                </Modal><Modal
-                    isOpen={showModal}
-                    onClose={() => setShowModal(false)}
-                >
-                    <Modal.Content
-                        width="full"
-                        height="full"
-                        roundedTop={15}
-                        backgroundColor="gray.200"
-                        marginBottom={0}
-                        marginTop="auto"
-                    >
-                        <Modal.Body
-                            padding={6}
-                        >
-                            <Text
-                                fontFamily="heading"
-                                fontSize="lg"
-                                mt={4}
-                            >
-                                Filtrar anúncios
-                            </Text>
-                            <VStack>
-                                <Text
-                                    fontFamily="heading"
-                                    color="gray.600"
-                                    fontSize="sm"
-                                    mt={4}
-                                >
-                                    Condição
-                                </Text>
-
-                                <HStack
-                                    w="50%"
-                                    h={6}
-                                    mt={2}
-                                >
-                                    <LittleButton
-                                        type="darkBlue"
-                                        fontSize="xs"
-                                    />
-                                    <LittleButton
-                                        type="darkGray"
-                                        ml={2}
-                                        fontSize="xs"
-                                    />
-                                </HStack>
-                            </VStack>
-
-                            <VStack
-                                mt={2}
-                            >
-                                <Text
-                                    fontFamily="heading"
-                                    color="gray.600"
-                                    fontSize="sm"
-                                    mt={4}
-                                >
-                                    Aceita trocas?
-                                </Text>
-
-                                <HStack
-                                    w="50%"
-                                    h={6}
-                                    mt={2}
-                                >
-                                    <Switch size="lg" />
-                                </HStack>
-                            </VStack>
-
-                            <VStack
-                                mt={2}
-                            >
-                                <Text
-                                    fontFamily="heading"
-                                    color="gray.600"
-                                    fontSize="sm"
-                                    mt={4}
-                                >
-                                    Meios de pagamento aceitos
-                                </Text>
-
-                                <VStack
-                                    mt={2}
-                                >
-                                    <Checkbox value="Boleto" colorScheme="purple" defaultIsChecked>
-                                        Boleto
-                                    </Checkbox>
-                                    <Checkbox value="Pix" colorScheme="purple" defaultIsChecked>
-                                        Pix
-                                    </Checkbox>
-                                    <Checkbox value="Dinheiro" colorScheme="purple" defaultIsChecked>
-                                        Dinheiro
-                                    </Checkbox>
-                                    <Checkbox value="Credito" colorScheme="purple" defaultIsChecked>
-                                        Cartão de crédito
-                                    </Checkbox>
-                                    <Checkbox value="Deposito" colorScheme="purple" defaultIsChecked>
-                                        Depósito Bancário
-                                    </Checkbox>
                                 </VStack>
                             </VStack>
 
