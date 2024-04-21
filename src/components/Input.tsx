@@ -11,157 +11,19 @@ type Props = IInputProps & {
     errorMessage?: string;
     search?: boolean;
     money?: boolean;
-    filterFunction?: () => void;
+    showModal?: () => void;
 }
 
-export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, money = false, filterFunction, ...rest }: Props) {
+export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, money = false, showModal, ...rest }: Props) {
 
     const { colors } = useTheme();
 
     const [show, setShow] = useState(false);
 
-    const [showModal, setShowModal] = useState(false);
-
     const invalid = !!errorMessage || isInvalid; //aqui setamos uma variável invalid baseado em msg de erro e invalid que o proprio yup passa pra Button, e aí jogamos no FormControl
 
     return (
         <FormControl isInvalid={invalid}>
-            <Modal
-                isOpen={showModal}
-                onClose={() => setShowModal(false)}
-            >
-                <Modal.Content
-                    width="full"
-                    height="full"
-                    roundedTop={15}
-                    backgroundColor="gray.200"
-                    marginBottom={0}
-                    marginTop="auto"
-                >
-                    <Modal.Body
-                        padding={6}
-                    >
-                        <Text
-                            fontFamily="heading"
-                            fontSize="lg"
-                            mt={4}
-                        >
-                            Filtrar anúncios
-                        </Text>
-                        <VStack>
-                            <Text
-                                fontFamily="heading"
-                                color="gray.600"
-                                fontSize="sm"
-                                mt={4}
-                            >
-                                Condição
-                            </Text>
-
-                            <HStack
-                                w="50%"
-                                h={6}
-                                mt={2}
-                            >
-                                <LittleButton
-                                    type="modalBlue"
-                                    title="novo"
-                                    backgroundColor="blue.100"
-                                    color="gray.100"
-                                    fontSize="xs"
-                                />
-                                <LittleButton
-                                    type="modalGray"
-                                    title="usado"
-                                    ml={2}
-                                    fontSize="xs"
-                                />
-                            </HStack>
-                        </VStack>
-
-                        <VStack
-                            mt={2}
-                        >
-                            <Text
-                                fontFamily="heading"
-                                color="gray.600"
-                                fontSize="sm"
-                                mt={4}
-                            >
-                                Aceita trocas?
-                            </Text>
-
-                            <HStack
-                                w="50%"
-                                h={6}
-                                mt={2}
-                            >
-                                <Switch size="lg" />
-                            </HStack>
-                        </VStack>
-
-                        <VStack
-                            mt={2}
-                        >
-                            <Text
-                                fontFamily="heading"
-                                color="gray.600"
-                                fontSize="sm"
-                                mt={4}
-                            >
-                                Meios de pagamento aceitos
-                            </Text>
-
-                            <VStack
-                                mt={2}
-                            >
-                                <Checkbox value="Boleto" colorScheme="purple" defaultIsChecked>
-                                    Boleto
-                                </Checkbox>
-                                <Checkbox value="Pix" colorScheme="purple" defaultIsChecked>
-                                    Pix
-                                </Checkbox>
-                                <Checkbox value="Dinheiro" colorScheme="purple" defaultIsChecked>
-                                    Dinheiro
-                                </Checkbox>
-                                <Checkbox value="Credito" colorScheme="purple" defaultIsChecked>
-                                    Cartão de crédito
-                                </Checkbox>
-                                <Checkbox value="Deposito" colorScheme="purple" defaultIsChecked>
-                                    Depósito Bancário
-                                </Checkbox>
-                            </VStack>
-                        </VStack>
-
-                        <HStack
-                            mt={6}
-                        >
-                            <Button
-                                flex={1}
-                                onPress={() => {
-                                    setShowModal(false);
-                                }}
-                                title="Resetar filtros"
-                                type="gray"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                flex={1}
-                                ml={2}
-                                onPress={() => {
-                                    setShowModal(false);
-                                }}
-                                title="Aplicar filtros"
-                                type="black"
-                            >
-                                Save
-                            </Button>
-                        </HStack>
-                    </Modal.Body>
-                </Modal.Content>
-            </Modal>
-
             <NativeBaseInput
                 bgColor="gray.100"
                 borderWidth={0}
@@ -195,7 +57,7 @@ export function Input({ placeHolder, senha = false, isInvalid, errorMessage, sea
                             h={4}
                         />
                         <Pressable
-                            onPress={() => setShowModal(true)}
+                            onPress={showModal}
                         >
                             <Icon as={Sliders} color={colors.gray[700]} />
                         </Pressable>

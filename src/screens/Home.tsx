@@ -1,4 +1,4 @@
-import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Image } from "native-base";
+import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Image, Modal, Switch, Checkbox } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@components/Button";
 import { Plus, Tag, ArrowRight } from "phosphor-react-native";
@@ -14,6 +14,8 @@ import { useCallback, useState } from "react";
 import { api } from "@services/api";
 import { productsProps } from "@dtos/ProductDTO";
 import { maskCurrency } from "@utils/masks";
+import { LittleButton } from "@components/LittleButton";
+import { LittleButtonSelect } from "@components/LittleButtonSelect";
 
 
 export function Home() {
@@ -23,6 +25,12 @@ export function Home() {
 
     const [productsArray, setProductsArray] = useState<productsProps[]>([] as productsProps[]);
     const [myProductsArray, setMyProductsArray] = useState<productsProps[]>([] as productsProps[]);
+
+    const [showModal, setShowModal] = useState(false);
+
+    const [isNew, setIsNew] = useState<boolean>(true);
+    const [acceptTrade, setAcceptTrade] = useState<boolean>(false);
+    const [paymentMethods, setPaymentMethods] = useState<string[]>(["boleto", "deposit", "cash", "card", "pix"]);
 
     const { user } = useAuth();
 
@@ -65,6 +73,283 @@ export function Home() {
                     flex: 1
                 }}
             >
+
+                <Modal
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                >
+                    <Modal.Content
+                        width="full"
+                        height="full"
+                        roundedTop={15}
+                        backgroundColor="gray.200"
+                        marginBottom={0}
+                        marginTop="auto"
+                    >
+                        <Modal.Body
+                            padding={6}
+                        >
+                            <Text
+                                fontFamily="heading"
+                                fontSize="lg"
+                                mt={4}
+                            >
+                                Filtrar anúncios
+                            </Text>
+                            <VStack>
+                                <Text
+                                    fontFamily="heading"
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    mt={4}
+                                >
+                                    Condição
+                                </Text>
+
+                                <HStack
+                                    w="50%"
+                                    h={6}
+                                    mt={2}
+                                >
+                                    <TouchableOpacity
+                                        onPress={() => setIsNew(true)}
+                                    >
+                                        <LittleButtonSelect
+                                            type="modalBlue"
+                                            isSelected={isNew}
+                                            fontSize="xs"
+                                        />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => setIsNew(false)}
+                                    >
+                                        <LittleButtonSelect
+                                            type="modalGray"
+                                            isSelected={!isNew}
+                                            ml={2}
+                                            fontSize="xs"
+                                        />
+                                    </TouchableOpacity>
+                                </HStack>
+                            </VStack>
+
+                            <VStack
+                                mt={2}
+                            >
+                                <Text
+                                    fontFamily="heading"
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    mt={4}
+                                >
+                                    Aceita trocas?
+                                </Text>
+
+                                <HStack
+                                    w="50%"
+                                    h={6}
+                                    mt={2}
+                                >
+                                    <Switch value={acceptTrade} size="lg" />
+                                </HStack>
+                            </VStack>
+
+                            <VStack
+                                mt={2}
+                            >
+                                <Text
+                                    fontFamily="heading"
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    mt={4}
+                                >
+                                    Meios de pagamento aceitos
+                                </Text>
+
+                                <VStack
+                                    mt={2}
+                                >
+                                    <Checkbox.Group
+                                        onChange={() => setPaymentMethods}
+                                        value={paymentMethods}
+                                        accessibilityLabel="choose payment methods">
+                                        <Checkbox value="boleto" colorScheme="blue" defaultIsChecked>
+                                            Boleto
+                                        </Checkbox>
+                                        <Checkbox value="pix" colorScheme="blue" defaultIsChecked>
+                                            Pix
+                                        </Checkbox>
+                                        <Checkbox value="cash" colorScheme="blue" defaultIsChecked>
+                                            Dinheiro
+                                        </Checkbox>
+                                        <Checkbox value="card" colorScheme="blue" defaultIsChecked>
+                                            Cartão de crédito
+                                        </Checkbox>
+                                        <Checkbox value="deposit" colorScheme="blue" defaultIsChecked>
+                                            Depósito Bancário
+                                        </Checkbox>
+                                    </Checkbox.Group>
+                                </VStack>
+                            </VStack>
+
+                            <HStack
+                                mt={6}
+                            >
+                                <Button
+                                    flex={1}
+                                    onPress={() => {
+                                        setShowModal(false);
+                                    }}
+                                    title="Resetar filtros"
+                                    type="gray"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    flex={1}
+                                    ml={2}
+                                    onPress={() => {
+                                        setShowModal(false);
+                                    }}
+                                    title="Aplicar filtros"
+                                    type="black"
+                                >
+                                    Save
+                                </Button>
+                            </HStack>
+                        </Modal.Body>
+                    </Modal.Content>
+                </Modal><Modal
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                >
+                    <Modal.Content
+                        width="full"
+                        height="full"
+                        roundedTop={15}
+                        backgroundColor="gray.200"
+                        marginBottom={0}
+                        marginTop="auto"
+                    >
+                        <Modal.Body
+                            padding={6}
+                        >
+                            <Text
+                                fontFamily="heading"
+                                fontSize="lg"
+                                mt={4}
+                            >
+                                Filtrar anúncios
+                            </Text>
+                            <VStack>
+                                <Text
+                                    fontFamily="heading"
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    mt={4}
+                                >
+                                    Condição
+                                </Text>
+
+                                <HStack
+                                    w="50%"
+                                    h={6}
+                                    mt={2}
+                                >
+                                    <LittleButton
+                                        type="darkBlue"
+                                        fontSize="xs"
+                                    />
+                                    <LittleButton
+                                        type="darkGray"
+                                        ml={2}
+                                        fontSize="xs"
+                                    />
+                                </HStack>
+                            </VStack>
+
+                            <VStack
+                                mt={2}
+                            >
+                                <Text
+                                    fontFamily="heading"
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    mt={4}
+                                >
+                                    Aceita trocas?
+                                </Text>
+
+                                <HStack
+                                    w="50%"
+                                    h={6}
+                                    mt={2}
+                                >
+                                    <Switch size="lg" />
+                                </HStack>
+                            </VStack>
+
+                            <VStack
+                                mt={2}
+                            >
+                                <Text
+                                    fontFamily="heading"
+                                    color="gray.600"
+                                    fontSize="sm"
+                                    mt={4}
+                                >
+                                    Meios de pagamento aceitos
+                                </Text>
+
+                                <VStack
+                                    mt={2}
+                                >
+                                    <Checkbox value="Boleto" colorScheme="purple" defaultIsChecked>
+                                        Boleto
+                                    </Checkbox>
+                                    <Checkbox value="Pix" colorScheme="purple" defaultIsChecked>
+                                        Pix
+                                    </Checkbox>
+                                    <Checkbox value="Dinheiro" colorScheme="purple" defaultIsChecked>
+                                        Dinheiro
+                                    </Checkbox>
+                                    <Checkbox value="Credito" colorScheme="purple" defaultIsChecked>
+                                        Cartão de crédito
+                                    </Checkbox>
+                                    <Checkbox value="Deposito" colorScheme="purple" defaultIsChecked>
+                                        Depósito Bancário
+                                    </Checkbox>
+                                </VStack>
+                            </VStack>
+
+                            <HStack
+                                mt={6}
+                            >
+                                <Button
+                                    flex={1}
+                                    onPress={() => {
+                                        setShowModal(false);
+                                    }}
+                                    title="Resetar filtros"
+                                    type="gray"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    flex={1}
+                                    ml={2}
+                                    onPress={() => {
+                                        setShowModal(false);
+                                    }}
+                                    title="Aplicar filtros"
+                                    type="black"
+                                >
+                                    Save
+                                </Button>
+                            </HStack>
+                        </Modal.Body>
+                    </Modal.Content>
+                </Modal>
 
                 <HStack
                     alignItems="center"
@@ -168,7 +453,7 @@ export function Home() {
                             >
                                 Compre produtos variados
                             </Text>
-                            <Input placeHolder="Buscar anúncio" search />
+                            <Input placeHolder="Buscar anúncio" search showModal={() => setShowModal(true)} />
                         </VStack>
                     </View>
 
@@ -181,7 +466,7 @@ export function Home() {
                                 nome={item.name}
                                 valor={maskCurrency(String(item.price))}
                                 uri={item.product_images[0].path}
-                                userUri={user.avatar}
+                                userUri={item.user.avatar}
                                 flex={0.5}
                                 marginTop={12}
                                 margin={6}

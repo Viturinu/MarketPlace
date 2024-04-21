@@ -38,5 +38,7 @@ export type productsProps = {
     updated_at: string;
     product_images: product_image_props[];
     payment_methods: payment_method_props[];
-    ownerPicture: string;
+    user: {
+        avatar: string;
+    };
 }
