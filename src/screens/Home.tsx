@@ -61,6 +61,16 @@ export function Home() {
         console.log("Mudou pra: " + isNew);
     }
 
+    async function handleFilterApply() {
+        try {
+            console.log("VAMOS FAZER A CHAMADA À API COM ESSES DADOS: " + JSON.stringify(isNew + " - " + " - " + acceptTrade + " - " + paymentMethods));
+        } catch (error) {
+
+        } finally {
+            setShowModal(false);
+        }
+    }
+
     useFocusEffect(useCallback(() => {
         loadUserImageAndAnnounces();
     }, []))
@@ -76,7 +86,7 @@ export function Home() {
                     flex: 1
                 }}
             >
-                <ModalFilter showModal={showModal} setShowModal={setShowModal} acceptTrade={acceptTrade} setAcceptTrade={setAcceptTrade} isNew={isNew} setIsNew={setIsNew} paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods} />
+                <ModalFilter showModal={showModal} setShowModal={setShowModal} acceptTrade={acceptTrade} setAcceptTrade={setAcceptTrade} isNew={isNew} setIsNew={setIsNew} paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods} handleFilterApply={handleFilterApply} />
 
                 <HStack
                     alignItems="center"

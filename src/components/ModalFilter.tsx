@@ -14,10 +14,11 @@ type Props = {
     setIsNew: (variable: boolean) => void;
     showModal: boolean;
     setShowModal: (variable: boolean) => void;
+    handleFilterApply: () => void;
 
 }
 
-export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTrade, paymentMethods, setPaymentMethods, isNew, setIsNew }: Props) {
+export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTrade, paymentMethods, setPaymentMethods, isNew, setIsNew, handleFilterApply }: Props) {
     return (
         <Modal
             isOpen={showModal}
@@ -114,22 +115,25 @@ export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTra
                             mt={2}
                         >
                             <Checkbox.Group
-                                onChange={() => setPaymentMethods}
+                                onChange={values => {
+                                    setPaymentMethods(values || [])
+                                }}
+                                defaultValue={paymentMethods}
                                 value={paymentMethods}
                                 accessibilityLabel="choose payment methods">
-                                <Checkbox value="boleto" colorScheme="blue" defaultIsChecked>
+                                <Checkbox value="boleto" colorScheme="blue">
                                     Boleto
                                 </Checkbox>
-                                <Checkbox value="pix" colorScheme="blue" defaultIsChecked>
+                                <Checkbox value="pix" colorScheme="blue">
                                     Pix
                                 </Checkbox>
-                                <Checkbox value="cash" colorScheme="blue" defaultIsChecked>
+                                <Checkbox value="cash" colorScheme="blue">
                                     Dinheiro
                                 </Checkbox>
-                                <Checkbox value="card" colorScheme="blue" defaultIsChecked>
+                                <Checkbox value="card" colorScheme="blue">
                                     Cartão de crédito
                                 </Checkbox>
-                                <Checkbox value="deposit" colorScheme="blue" defaultIsChecked>
+                                <Checkbox value="deposit" colorScheme="blue">
                                     Depósito Bancário
                                 </Checkbox>
                             </Checkbox.Group>
@@ -152,9 +156,7 @@ export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTra
                         <Button
                             flex={1}
                             ml={2}
-                            onPress={() => {
-                                setShowModal(false);
-                            }}
+                            onPress={handleFilterApply}
                             title="Aplicar filtros"
                             type="black"
                         >
