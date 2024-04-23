@@ -24,6 +24,8 @@ export function Home() {
     const [productsArray, setProductsArray] = useState<productsProps[]>([] as productsProps[]);
     const [myProductsArray, setMyProductsArray] = useState<productsProps[]>([] as productsProps[]);
 
+    const [query, setQuery] = useState("");
+
     const [isNew, setIsNew] = useState<boolean>(true); //Este é o estado que guarda de fato o estado, os outros relacionados são helpers
     const [acceptTrade, setAcceptTrade] = useState<boolean>(false);
     const [paymentMethods, setPaymentMethods] = useState<string[]>(["boleto", "pix", "cash", "card", "deposit"]);
@@ -40,11 +42,7 @@ export function Home() {
             const arrayProducts = await api.get("/products");
             setProductsArray(arrayProducts.data);
 
-            const productsArrayWithOwnerPicture = productsArray.map(item => {
-
-            })
-
-            const myProductsArray = await api.get("/users/products");
+            const myProductsArray = await api.get("/users/products"); //para contador na Home
             setMyProductsArray(myProductsArray.data);
             //console.log(`${api.defaults.baseURL}/images/${user.avatar}`)
             //console.log(userImage)
@@ -56,19 +54,29 @@ export function Home() {
         }
     }
 
-    function handleSetIsNew(isNew: boolean) {
-        setIsNew(isNew);
-        console.log("Mudou pra: " + isNew);
-    }
-
-    async function handleFilterApply() {
+    async function handleSearch() {
         try {
-            console.log("VAMOS FAZER A CHAMADA À API COM ESSES DADOS: " + JSON.stringify(isNew + " - " + " - " + acceptTrade + " - " + paymentMethods));
+            const response = await api.get("/products", {
+                params: {
+                    is_new: isNew,
+                    accept_trade: acceptTrade,
+                    payment_methods: paymentMethods, // Aqui não é necessário fazer join(','), pois o Axios irá lidar com isso automaticamente
+                    query: query
+                }
+            })
+
+            setProductsArray(response.data);
         } catch (error) {
 
         } finally {
             setShowModal(false);
         }
+    }
+
+    function handleResetValues() {
+        setIsNew(true);
+        setAcceptTrade(true);
+        setPaymentMethods(["boleto", "pix", "cash", "card", "deposit"])
     }
 
     useFocusEffect(useCallback(() => {
@@ -86,7 +94,7 @@ export function Home() {
                     flex: 1
                 }}
             >
-                <ModalFilter showModal={showModal} setShowModal={setShowModal} acceptTrade={acceptTrade} setAcceptTrade={setAcceptTrade} isNew={isNew} setIsNew={setIsNew} paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods} handleFilterApply={handleFilterApply} />
+                <ModalFilter showModal={showModal} setShowModal={setShowModal} acceptTrade={acceptTrade} setAcceptTrade={setAcceptTrade} isNew={isNew} setIsNew={setIsNew} paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods} handleFilterApply={handleSearch} handleResetValues={handleResetValues} />
 
                 <HStack
                     alignItems="center"
@@ -190,7 +198,7 @@ export function Home() {
                             >
                                 Compre produtos variados
                             </Text>
-                            <Input placeHolder="Buscar anúncio" search showModal={() => setShowModal(true)} />
+                            <Input placeHolder="Buscar anúncio" search showModal={() => setShowModal(true)} handleSearch={handleSearch} onChangeText={setQuery} value={query} onSubmitEditing={handleSearch} />
                         </VStack>
                     </View>
 

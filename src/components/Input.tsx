@@ -2,8 +2,6 @@ import { Input as NativeBaseInput, IInputProps, Pressable, Icon, FormControl, Te
 import React, { useState } from "react";
 import { MaterialIcons } from '@expo/vector-icons';
 import { MagnifyingGlass, Sliders } from "phosphor-react-native";
-import { Button } from "./Button";
-import { LittleButton } from "./LittleButton";
 
 type Props = IInputProps & {
     placeHolder: string;
@@ -12,9 +10,10 @@ type Props = IInputProps & {
     search?: boolean;
     money?: boolean;
     showModal?: () => void;
+    handleSearch: () => void;
 }
 
-export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, money = false, showModal, ...rest }: Props) {
+export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, money = false, showModal, handleSearch, ...rest }: Props) {
 
     const { colors } = useTheme();
 
@@ -46,7 +45,9 @@ export function Input({ placeHolder, senha = false, isInvalid, errorMessage, sea
                         alignItems="center"
                         mr={3}
                     >
-                        <Pressable>
+                        <Pressable
+                            onPress={handleSearch}
+                        >
                             <Icon as={MagnifyingGlass} color={colors.gray[700]} />
                         </Pressable >
                         <Divider

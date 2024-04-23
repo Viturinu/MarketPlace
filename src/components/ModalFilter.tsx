@@ -15,10 +15,11 @@ type Props = {
     showModal: boolean;
     setShowModal: (variable: boolean) => void;
     handleFilterApply: () => void;
+    handleResetValues: () => void;
 
 }
 
-export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTrade, paymentMethods, setPaymentMethods, isNew, setIsNew, handleFilterApply }: Props) {
+export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTrade, paymentMethods, setPaymentMethods, isNew, setIsNew, handleFilterApply, handleResetValues }: Props) {
     return (
         <Modal
             isOpen={showModal}
@@ -145,9 +146,7 @@ export function ModalFilter({ showModal, setShowModal, acceptTrade, setAcceptTra
                     >
                         <Button
                             flex={1}
-                            onPress={() => {
-                                setShowModal(false);
-                            }}
+                            onPress={handleResetValues}
                             title="Resetar filtros"
                             type="gray"
                         >
