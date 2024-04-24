@@ -6,7 +6,7 @@ import { ProductPreview } from "@screens/ProductPreview";
 import { useTheme } from "native-base";
 import { AppRoutesBottomTab } from "./app.routes.bottomtab";
 import { MyProducts } from "@screens/MyProducts";
-import { photoFileProps } from "@dtos/ProductDTO";
+import { photoFileProps, productsProps } from "@dtos/ProductDTO";
 
 type AppRoutesNativeStack = {
     BottomTabNavigator: undefined;
@@ -21,7 +21,7 @@ type AppRoutesNativeStack = {
         accept_trade: boolean;
         payment_methods: string[];
     };
-    productDetails: undefined;
+    productDetails: productsProps;
     editProduct: undefined;
 
 }

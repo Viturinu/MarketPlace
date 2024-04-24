@@ -16,7 +16,6 @@ import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { unmaskCurrency } from "@utils/unmasks";
 import { useState } from "react";
-import { AppRoutesBottomTabProps } from "@routes/app.routes.bottomtab";
 
 export function ProductPreview() {
 

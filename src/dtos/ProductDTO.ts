@@ -21,7 +21,7 @@ export type product_image_props = {
 }
 
 export type payment_method_props = {
-    key: string;
+    key: "boleto" | "pix" | "cash" | "card" | "deposit";
     name: string;
 }
 
@@ -39,6 +39,7 @@ export type productsProps = {
     product_images: product_image_props[];
     payment_methods: payment_method_props[];
     user: {
+        name: string;
         avatar: string;
     };
 }

@@ -60,7 +60,7 @@ export function NewProduct() {
                 aspect: [4, 4],
                 quality: 1,
                 allowsEditing: true
-            }); //aqui está a uri da foto editada, no browser do aparelho, com as configurações de corte e dimensões;
+            }); //aqui está a uri da foto editada (deve ficar em algum cash a edição), no browser do aparelho, com as configurações de corte e dimensões;
 
             if (userPhoto.canceled) return;
 
@@ -222,7 +222,6 @@ export function NewProduct() {
                                                     width="100%"
                                                     position="absolute"
                                                 />
-
                                             </HStack>
 
                                             <TouchableOpacity
@@ -364,7 +363,6 @@ export function NewProduct() {
                                         placeHolder=""
                                         value={value}
                                         onChangeText={value => onChange(maskCurrency(value))}
-
                                         errorMessage={errors.price?.message}
                                         money />
 

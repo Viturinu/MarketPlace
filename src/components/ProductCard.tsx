@@ -1,10 +1,10 @@
-import { VStack, Image, Text, IPressableProps, HStack, View, Flex, Box } from "native-base";
-import { Pressable } from "react-native";
+import { VStack, Image, Text, IPressableProps, HStack, View, Box } from "native-base";
+import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { LittleButton } from "./LittleButton";
 import { ProfilePicture } from "./ProfilePicture";
 import { api } from "@services/api";
 
-type Props = IPressableProps & {
+type Props = TouchableOpacityProps & {
     nome?: string;
     valor?: string;
     uri: string;
@@ -12,17 +12,18 @@ type Props = IPressableProps & {
     status?: "novo" | "usado";
     isActive?: boolean;
     profilePicture?: boolean;
+    getInFunction: () => void;
 }
 
-export function ProductCard({ nome, valor, uri, profilePicture = true, status = "novo", userUri, isActive = true, ...rest }: Props) {
+export function ProductCard({ nome, valor, uri, profilePicture = true, status = "novo", userUri, isActive = true, getInFunction, ...rest }: Props) {
     return (
-        <Pressable
+        <TouchableOpacity
+            onPress={getInFunction}
             {...rest}
         >
             <VStack
                 height={24}
-                maxHeight={24}
-                flex={1}
+                width="95%"
             >
                 <VStack
                     justifyContent="space-between"
@@ -55,7 +56,6 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                         />
                         <LittleButton
                             type={status === "novo" ? "darkBlue" : "darkGray"}
-                            title={status}
                             fontSize="2xs"
                             height={4}
                             mt={1}
@@ -130,6 +130,6 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                     </Text>
                 </HStack>
             </VStack>
-        </Pressable>
+        </TouchableOpacity>
     )
 }

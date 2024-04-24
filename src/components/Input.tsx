@@ -10,7 +10,7 @@ type Props = IInputProps & {
     search?: boolean;
     money?: boolean;
     showModal?: () => void;
-    handleSearch: () => void;
+    handleSearch?: () => void;
 }
 
 export function Input({ placeHolder, senha = false, isInvalid, errorMessage, search, money = false, showModal, handleSearch, ...rest }: Props) {

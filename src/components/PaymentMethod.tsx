@@ -2,7 +2,7 @@ import { Box, HStack, Icon, Text, useTheme } from "native-base";
 import { Bank, Barcode, CreditCard, Money, QrCode } from "phosphor-react-native";
 
 type Props = {
-    tipo: "boleto" | "pix" | "dinheiro" | "credito" | "deposito";
+    tipo: "boleto" | "pix" | "cash" | "card" | "deposit";
 }
 
 export function PaymentMethod({ tipo }: Props) {
@@ -18,8 +18,8 @@ export function PaymentMethod({ tipo }: Props) {
                 {
                     tipo === "boleto" ? <Barcode size={18} color={iconColor} weight="regular" /> :
                         tipo === "pix" ? <QrCode size={18} color={iconColor} weight="regular" /> :
-                            tipo === "dinheiro" ? <Money size={18} color={iconColor} weight="regular" /> :
-                                tipo === "credito" ? <CreditCard size={18} color={iconColor} weight="regular" /> :
+                            tipo === "cash" ? <Money size={18} color={iconColor} weight="regular" /> :
+                                tipo === "card" ? <CreditCard size={18} color={iconColor} weight="regular" /> :
                                     <Bank size={18} color={iconColor} weight="regular" />
                 }
             </Box>
@@ -34,8 +34,8 @@ export function PaymentMethod({ tipo }: Props) {
                     {
                         tipo === "boleto" ? "Boleto" :
                             tipo === "pix" ? "Pix" :
-                                tipo === "dinheiro" ? "Dinheiro" :
-                                    tipo === "credito" ? "Cartão de Crédito" :
+                                tipo === "cash" ? "Dinheiro" :
+                                    tipo === "card" ? "Cartão de Crédito" :
                                         "Depósito Bancário"
                     }
                 </Text>

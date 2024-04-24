@@ -79,6 +79,10 @@ export function Home() {
         setPaymentMethods(["boleto", "pix", "cash", "card", "deposit"])
     }
 
+    function handleGetInFunction(item: productsProps) {
+        navigationStack.navigate("productDetails", item)
+    }
+
     useFocusEffect(useCallback(() => {
         loadUserImageAndAnnounces();
     }, []))
@@ -212,9 +216,7 @@ export function Home() {
                                 valor={maskCurrency(String(item.price))}
                                 uri={item.product_images[0].path}
                                 userUri={item.user.avatar}
-                                flex={0.5}
-                                marginTop={12}
-                                margin={6}
+                                getInFunction={() => handleGetInFunction(item)}
                             />
                         )}
                         style={{

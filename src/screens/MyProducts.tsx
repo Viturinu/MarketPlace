@@ -21,14 +21,22 @@ export function MyProducts() {
     async function updateMyProducts() {
         try {
             setIsLoading(true);
-            const productArray = await api.get("/users/products");
-            setProductArray(productArray.data);
+            const response = await api.get("/users/products");
+            setProductArray(response.data);
+
+            if (productArray.length % 2 !== 0) {
+
+            }
         } catch (error) {
             console.log(error);
         }
         finally {
             setIsLoading(false);
         }
+    }
+
+    function getInMyProduct() {
+        console.log("Entrei no meu produto");
     }
 
     useFocusEffect(useCallback(() => {
@@ -85,10 +93,8 @@ export function MyProducts() {
                             isActive={item.is_active}
                             valor={maskCurrency(String(item.price))}
                             uri={item.product_images[0].path}
-                            flex={0.5}
-                            marginTop={12}
-                            margin={6}
                             profilePicture={false}
+                            getInFunction={getInMyProduct}
                         />
                     )}
                     style={{
