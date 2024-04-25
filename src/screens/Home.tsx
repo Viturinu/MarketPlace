@@ -212,10 +212,7 @@ export function Home() {
                         keyExtractor={item => item.name + item.price}
                         renderItem={({ item }) => (
                             <ProductCard
-                                nome={item.name}
-                                valor={maskCurrency(String(item.price))}
-                                uri={item.product_images[0].path}
-                                userUri={item.user.avatar}
+                                product={item}
                                 getInFunction={() => handleGetInFunction(item)}
                             />
                         )}

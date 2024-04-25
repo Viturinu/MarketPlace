@@ -6,27 +6,30 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { api } from "@services/api";
 import { productsProps } from "@dtos/ProductDTO";
-import { maskCurrency } from "@utils/masks";
 
 export function MyProducts() {
+
+    const navigationStack = useNavigation<AppRoutesNativeStackProps>();
 
     const [service, setService] = useState("Todos");
 
     const [isLoading, setIsLoading] = useState(true);
 
-    const [productArray, setProductArray] = useState<productsProps[]>([] as productsProps[]);
+    const [productsArray, setProductArray] = useState<productsProps[]>([] as productsProps[]);
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
+
+    function handleGetInFunction(item: productsProps) {
+        navigationStack.navigate("productDetails", item)
+    }
 
     async function updateMyProducts() {
         try {
             setIsLoading(true);
             const response = await api.get("/users/products");
-            setProductArray(response.data);
+            console.log(response.data)
+            setProductArray([...response.data, {} as productsProps]);
 
-            if (productArray.length % 2 !== 0) {
-
-            }
         } catch (error) {
             console.log(error);
         }
@@ -36,7 +39,7 @@ export function MyProducts() {
     }
 
     function getInMyProduct() {
-        console.log("Entrei no meu produto");
+        console.log("Entrei no meu produto" + productsArray.length);
     }
 
     useFocusEffect(useCallback(() => {
@@ -66,7 +69,7 @@ export function MyProducts() {
                     color="gray.600"
                     ml={2}
                 >
-                    {productArray.length} anúncios
+                    {productsArray.length} anúncios
                 </Text>
                 <Box>
                     <Select selectedValue={service} width={110} height={8} accessibilityLabel="Todos" placeholderTextColor="gray.600" placeholder="Todos" _selectedItem={{
@@ -83,18 +86,14 @@ export function MyProducts() {
             </HStack>
             {
                 !isLoading && <FlatList
-                    data={productArray}
+                    data={productsArray}
                     numColumns={2}
-                    keyExtractor={(item, index) => item.name + item.price + " - " + index}
+                    keyExtractor={(item, index) => item.name + index}
                     renderItem={({ item }) => (
                         <ProductCard
-                            status={item.is_new ? "novo" : "usado"}
-                            nome={item.name}
-                            isActive={item.is_active}
-                            valor={maskCurrency(String(item.price))}
-                            uri={item.product_images[0].path}
+                            product={item}
+                            getInFunction={() => getInMyProduct()}
                             profilePicture={false}
-                            getInFunction={getInMyProduct}
                         />
                     )}
                     style={{
@@ -105,7 +104,7 @@ export function MyProducts() {
                             paddingBottom: 80,
 
                         },
-                        productArray.length === 0 && { flex: 1 },
+                        productsArray.length === 0 && { flex: 1 },
                     ]}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={() => (

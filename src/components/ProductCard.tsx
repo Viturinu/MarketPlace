@@ -3,19 +3,47 @@ import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { LittleButton } from "./LittleButton";
 import { ProfilePicture } from "./ProfilePicture";
 import { api } from "@services/api";
+import { productsProps } from "@dtos/ProductDTO";
 
 type Props = TouchableOpacityProps & {
-    nome?: string;
-    valor?: string;
-    uri: string;
-    userUri?: string;
-    status?: "novo" | "usado";
-    isActive?: boolean;
+    product: productsProps;
     profilePicture?: boolean;
     getInFunction: () => void;
 }
 
-export function ProductCard({ nome, valor, uri, profilePicture = true, status = "novo", userUri, isActive = true, getInFunction, ...rest }: Props) {
+export function ProductCard({ profilePicture = true, getInFunction, product, ...rest }: Props) {
+    if (Object.keys(product).length === 0) {
+        console.log("DEU INDEFINIUDO< CARAMBA");
+        return (
+            <VStack
+                height={24}
+                width="93%"
+                backgroundColor="amber.500"
+            >
+                <VStack
+                    justifyContent="space-between"
+                    flex={1}
+                    zIndex={2}
+                >
+                    <Box
+                        size={6}
+                        mt={1}
+                        ml={1}
+                    />
+                    <Box
+                        width="40%"
+                    />
+                    <LittleButton
+                        type={product.is_new ? "darkBlue" : "darkGray"}
+                        fontSize="2xs"
+                        height={4}
+                        mt={1}
+                        mr={1}
+                    />
+                </VStack>
+            </VStack>
+        )
+    }
     return (
         <TouchableOpacity
             onPress={getInFunction}
@@ -23,7 +51,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
         >
             <VStack
                 height={24}
-                width="95%"
+                width="93%"
             >
                 <VStack
                     justifyContent="space-between"
@@ -39,7 +67,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
 
                                 <ProfilePicture
                                     size={6}
-                                    uri={`${api.defaults.baseURL}/images/${userUri}`}
+                                    uri={`${api.defaults.baseURL}/images/${product.user.avatar}`}
                                     borderColor="gray.100"
                                     mt={1}
                                     ml={1}
@@ -55,7 +83,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                             width="40%"
                         />
                         <LittleButton
-                            type={status === "novo" ? "darkBlue" : "darkGray"}
+                            type={product.is_new ? "darkBlue" : "darkGray"}
                             fontSize="2xs"
                             height={4}
                             mt={1}
@@ -63,7 +91,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                         />
                     </HStack>
                     {
-                        !isActive && <Text
+                        !product.is_active && <Text
                             fontFamily="heading"
                             fontSize="2xs"
                             color="gray.100"
@@ -81,7 +109,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                     position="absolute"
                 >
                     {
-                        !isActive && <View
+                        !product.is_active && <View
                             height="100%"
                             width="100%"
                             bgColor={"rgba(0, 0, 0, 0.5)"}
@@ -91,7 +119,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                     }
 
                     <Image
-                        source={{ uri: `${api.defaults.baseURL}/images/${uri}` }}
+                        source={{ uri: `${api.defaults.baseURL}/images/${product.product_images[0].path}` }}
                         alt="Product picture"
                         resizeMode="stretch"
                         position="absolute"
@@ -109,7 +137,7 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                     fontFamily="body"
                     numberOfLines={1}
                 >
-                    {nome}
+                    {product.name}
                 </Text>
                 <HStack
                     alignItems="center"
@@ -126,10 +154,11 @@ export function ProductCard({ nome, valor, uri, profilePicture = true, status = 
                         fontFamily="heading"
                         fontSize="lg"
                     >
-                        {valor}
+                        {product.price}
                     </Text>
                 </HStack>
             </VStack>
         </TouchableOpacity>
     )
+
 }
