@@ -210,7 +210,7 @@ export function Home() {
                     <FlatList
                         data={productsArray}
                         numColumns={2}
-                        keyExtractor={item => item.name + item.price}
+                        keyExtractor={(item, index) => item.name + index}
                         renderItem={({ item }) => (
                             <ProductCard
                                 product={item}

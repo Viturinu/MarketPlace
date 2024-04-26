@@ -171,11 +171,7 @@ export function ProductPreview() {
                     >
                         <LittleButton
                             fontSize="2xs"
-                            background="gray.600"
-                            color={is_new === "new" ? "blue.100" : "gray.600"}
-                            title={is_new === "new" ? "novo" : "usado"}
-                            backgroundColor="gray.300"
-                        />
+                            type={is_new ? "darkBlue" : "darkGray"} />
                     </Box>
                     <HStack
                         justifyContent="space-between"
@@ -222,9 +218,9 @@ export function ProductPreview() {
                         >
                             {payment_methods.includes("boleto") && <PaymentMethod tipo="boleto" />}
 
-                            {payment_methods.includes("card") && <PaymentMethod tipo="credito" />}
-                            {payment_methods.includes("deposit") && <PaymentMethod tipo="deposito" />}
-                            {payment_methods.includes("cash") && <PaymentMethod tipo="dinheiro" />}
+                            {payment_methods.includes("card") && <PaymentMethod tipo="card" />}
+                            {payment_methods.includes("deposit") && <PaymentMethod tipo="deposit" />}
+                            {payment_methods.includes("cash") && <PaymentMethod tipo="cash" />}
                             {payment_methods.includes("pix") && <PaymentMethod tipo="pix" />}
                         </Box>
                     </VStack>

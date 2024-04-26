@@ -5,6 +5,7 @@ import { useTheme } from "native-base";
 import { House, SignOut, Tag } from "phosphor-react-native";
 import { Platform } from "react-native";
 import { useAuth } from "@hooks/useAuth";
+import { useEffect } from "react";
 
 type AppRoutesBottomTab = {
     home: undefined;
@@ -67,7 +68,9 @@ export function AppRoutesBottomTab() {
             <Screen
                 name="signOut"
                 component={() => {
-                    handleLogOut();
+                    useEffect(() => {
+                        handleLogOut();
+                    }, [])
                     return (
                         <>
                         </>

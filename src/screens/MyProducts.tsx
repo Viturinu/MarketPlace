@@ -19,10 +19,6 @@ export function MyProducts() {
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
-    function handleGetInFunction(item: productsProps) {
-        navigationStack.navigate("productDetails", item)
-    }
-
     async function handleActivityFilter(itemValue: string) {
         try {
             setIsLoading(true);
@@ -119,7 +115,7 @@ export function MyProducts() {
                         renderItem={({ item }) => (
                             <ProductCard
                                 product={item}
-                                getInFunction={() => getInMyProduct()}
+                                getInFunction={() => navigationStack.navigate("productDetails", item)}
                                 profilePicture={false}
                             />
                         )}

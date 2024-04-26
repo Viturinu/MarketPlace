@@ -11,6 +11,9 @@ import { Button } from "@components/Button";
 import { Power, Trash } from "phosphor-react-native";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
+import { useRoute } from "@react-navigation/native";
+import { productsProps } from "@dtos/ProductDTO";
+import { useEffect } from "react";
 
 type Props = {
     active: boolean;
@@ -18,17 +21,18 @@ type Props = {
 
 export function ProductStatus({ active }: Props) {
 
+    const route = useRoute();
+
+    const product = route.params as productsProps;
+
     const { user } = useAuth();
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight40 = ((Dimensions.get('window').height) * 0.35);
 
-    const images = [
-        "https://source.unsplash.com/1024x768/?nature",
-        "https://source.unsplash.com/1024x768/?water",
-        "https://source.unsplash.com/1024x768/?girl",
-        "https://source.unsplash.com/1024x768/?tree",
-    ];
+    useEffect(() => {
+        console.log(JSON.stringify(user));
+    }, [])
 
     return (
         <Box
@@ -40,10 +44,10 @@ export function ProductStatus({ active }: Props) {
                 <Carousel
                     width={screenWidth}
                     height={screenHeight40}
-                    data={images}
+                    data={product.product_images}
                     renderItem={({ item }) => {
                         return <CarouselPicture
-                            uri={item}
+                            uri={item.path}
                             active={active}
                         />
                     }}
@@ -56,17 +60,20 @@ export function ProductStatus({ active }: Props) {
                     mb={5}
                     paddingX={4}
                 >
-
-
                     <HStack>
-                        <ProfilePicture size={6} uri={`${api.defaults.baseURL}/images/${user.avatar}`} borderColor="blue.100" />
+                        <ProfilePicture
+                            size={6}
+                            uri={`${api.defaults.baseURL}/images/${user.avatar}`}
+                            borderColor="blue.100"
+                        />
+
                         <Text
                             fontSize="sm"
                             fontFamily="heading"
                             color="gray.600"
                             ml={2}
                         >
-                            Makenna Baptista
+                            {product.user.name}
                         </Text>
                     </HStack>
                     <Box
@@ -76,9 +83,7 @@ export function ProductStatus({ active }: Props) {
                     >
                         <LittleButton
                             fontSize="2xs"
-                            color="gray.600"
-                            title="novo"
-                            backgroundColor="gray.300"
+                            type={product.is_new ? "darkBlue" : "darkGray"}
                         />
                     </Box>
                     <HStack
@@ -90,7 +95,7 @@ export function ProductStatus({ active }: Props) {
                             fontFamily="heading"
                             color="gray.700"
                         >
-                            Bicicleta
+                            {product.name}
                         </Text>
                         <HStack
                             alignItems="center"
@@ -101,7 +106,7 @@ export function ProductStatus({ active }: Props) {
                     </HStack>
 
                     <Text fontSize="sm" color="gray.600" mt={2}>
-                        Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis in aliquam.
+                        {product.description}
                     </Text>
 
                     <HStack
@@ -111,7 +116,7 @@ export function ProductStatus({ active }: Props) {
                             Aceita trocas?
                         </Text>
                         <Text fontFamily="body" color="gray.600" fontSize="sm" ml={2}>
-                            Sim
+                            {product.accept_trade ? "Sim" : "Não"}
                         </Text>
                     </HStack>
 
@@ -125,9 +130,9 @@ export function ProductStatus({ active }: Props) {
                             mt={1}
                         >
                             <PaymentMethod tipo="boleto" />
-                            <PaymentMethod tipo="credito" />
-                            <PaymentMethod tipo="deposito" />
-                            <PaymentMethod tipo="dinheiro" />
+                            <PaymentMethod tipo="card" />
+                            <PaymentMethod tipo="deposit" />
+                            <PaymentMethod tipo="cash" />
                             <PaymentMethod tipo="pix" />
                         </Box>
                     </VStack>
@@ -141,6 +146,7 @@ export function ProductStatus({ active }: Props) {
                             type={active ? "black" : "blue"}
                             InternalIcon={Power}
                             weight="regular"
+
                         />
                         <Button
                             title="Excluir anúncio"

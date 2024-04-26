@@ -22,6 +22,7 @@ type AppRoutesNativeStack = {
         payment_methods: string[];
     };
     productDetails: productsProps;
+    productStatus: productsProps;
     editProduct: undefined;
 
 }
