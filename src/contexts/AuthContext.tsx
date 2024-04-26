@@ -92,6 +92,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
             //Remove do AsyncStorage os dados de usuário e token de usuário
             await storageAuthTokenRemove(); //excluindo do Async Storage
             await storageUserRemove(); //excluindo do Async Storage
+            console.log("CHAMOU LOG OUT")
         } catch (error) {
             throw error;
         } finally {

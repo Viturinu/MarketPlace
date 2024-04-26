@@ -80,7 +80,8 @@ export function Home() {
     }
 
     function handleGetInFunction(item: productsProps) {
-        navigationStack.navigate("productDetails", item)
+        JSON.stringify(item)
+        navigationStack.navigate("productDetails", item);
     }
 
     useFocusEffect(useCallback(() => {

@@ -11,7 +11,7 @@ export function MyProducts() {
 
     const navigationStack = useNavigation<AppRoutesNativeStackProps>();
 
-    const [service, setService] = useState("Todos");
+    const [activityStatus, setActivityStatus] = useState("Todos"); //precisa pois o Select tem um value, então precisamos colocar esse estado
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -23,12 +23,38 @@ export function MyProducts() {
         navigationStack.navigate("productDetails", item)
     }
 
+    async function handleActivityFilter(itemValue: string) {
+        try {
+            setIsLoading(true);
+            setActivityStatus(itemValue);
+
+            if (itemValue === "Todos") {
+                const response = await api.get("/users/products");
+                setProductArray(response.data);
+            }
+            else if (itemValue === "Ativos") {
+                const response = await api.get("/users/products");
+                const newProductsArray = response.data.filter(item => item.is_active)
+                setProductArray(newProductsArray);
+            }
+            else {
+                const response = await api.get("/users/products");
+                const newProductsArray = response.data.filter(item => !item.is_active)
+                setProductArray(newProductsArray);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
     async function updateMyProducts() {
         try {
             setIsLoading(true);
             const response = await api.get("/users/products");
-            console.log(response.data)
-            setProductArray([...response.data, {} as productsProps]);
+            setProductArray(response.data);
 
         } catch (error) {
             console.log(error);
@@ -72,53 +98,57 @@ export function MyProducts() {
                     {productsArray.length} anúncios
                 </Text>
                 <Box>
-                    <Select selectedValue={service} width={110} height={8} accessibilityLabel="Todos" placeholderTextColor="gray.600" placeholder="Todos" _selectedItem={{
+                    <Select selectedValue={activityStatus} width={110} height={8} accessibilityLabel="Todos" placeholderTextColor="gray.600" placeholder="Todos" _selectedItem={{
                         bg: "gray.200",
                         endIcon: <CheckIcon size="5" />
-                    }} mt={1} onValueChange={itemValue => setService(itemValue)}>
-                        <Select.Item label="UX Research" value="ux" />
-                        <Select.Item label="Web Development" value="web" />
-                        <Select.Item label="Cross Platform Development" value="cross" />
-                        <Select.Item label="UI Designing" value="ui" />
-                        <Select.Item label="Backend Development" value="backend" />
+                    }} mt={1} onValueChange={itemValue => handleActivityFilter(itemValue)}>
+                        <Select.Item label="Todos" value="Todos" />
+                        <Select.Item label="Ativos" value="Ativos" />
+                        <Select.Item label="Inativos" value="Inativos" />
                     </Select>
                 </Box>
             </HStack>
-            {
-                !isLoading && <FlatList
-                    data={productsArray}
-                    numColumns={2}
-                    keyExtractor={(item, index) => item.name + index}
-                    renderItem={({ item }) => (
-                        <ProductCard
-                            product={item}
-                            getInFunction={() => getInMyProduct()}
-                            profilePicture={false}
-                        />
-                    )}
-                    style={{
-                        marginTop: 10,
-                    }}
-                    contentContainerStyle={[
-                        {
-                            paddingBottom: 80,
+            <Box
+                flex={1}
+            >
+                {
+                    !isLoading && <FlatList
+                        data={productsArray}
+                        numColumns={2}
+                        keyExtractor={(item, index) => item.name + index}
+                        renderItem={({ item }) => (
+                            <ProductCard
+                                product={item}
+                                getInFunction={() => getInMyProduct()}
+                                profilePicture={false}
+                            />
+                        )}
+                        style={{
+                            marginTop: 10,
 
-                        },
-                        productsArray.length === 0 && { flex: 1 },
-                    ]}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={() => (
-                        <Center
-                            flex={1}
-                            alignItems="center"
-                            justifyContent="center"
-                        >
-                            <Text color="gray.600" fontFamily="body"> Não há itens à venda por enquanto</Text>
-                        </Center>
-                    )}
-                />
+                        }}
+                        contentContainerStyle={[
+                            {
+                                paddingBottom: 80,
+                                justifyContent: "space-evenly"
 
-            }
+                            },
+                            productsArray.length === 0 && { flex: 1 },
+                        ]}
+                        showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={() => (
+                            <Center
+                                flex={1}
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <Text color="gray.600" fontFamily="body"> Não há itens à venda por enquanto</Text>
+                            </Center>
+                        )}
+                    />
+
+                }
+            </Box>
         </Box>
     )
 }

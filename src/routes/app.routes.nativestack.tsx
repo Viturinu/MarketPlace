@@ -32,8 +32,6 @@ export type AppRoutesNativeStackProps = NativeStackNavigationProp<AppRoutesNativ
 
 export function AppRoutesNativeStack() {
 
-    const { sizes, colors } = useTheme(); //hooks precisam estar dentro de uma função (fora do return, a gente não tem acesso ao theme do nativebase, por isso precisamos desestruturar e chamar)
-
     return (
         <Navigator
             initialRouteName="BottomTabNavigator"
