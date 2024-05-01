@@ -59,7 +59,6 @@ export function AppRoutesBottomTab() {
                 name="myproducts"
                 component={MyProducts}
                 options={{
-
                     tabBarIcon: ({ color }) => (
                         <Tag size={20} weight="bold" color={color} />
                     )

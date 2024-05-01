@@ -20,7 +20,7 @@ import { RadioControlled } from "@components/RadioControlled";
 import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
 
 const schema = yup.object({
-    name: yup.string().required("É necessário colocar um título para criar um registro"),
+    name: yup.string().max(20, "Só é permitido 20 caracteres para o nome do produto").required("É necessário colocar um título para criar um registro"),
     description: yup.string().required("É necessário colocar uma descrição para criar um registro"),
     is_new: yup.string().required("É necessário dizer qual o status do produto"),
     price: yup.string().required("É necessário colocar um valor para o novo produto"),

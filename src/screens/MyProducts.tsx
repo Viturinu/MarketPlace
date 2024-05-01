@@ -115,7 +115,7 @@ export function MyProducts() {
                         renderItem={({ item }) => (
                             <ProductCard
                                 product={item}
-                                getInFunction={() => navigationStack.navigate("productDetails", item)}
+                                getInFunction={() => navigationStack.navigate("productStatus", item)}
                                 profilePicture={false}
                             />
                         )}

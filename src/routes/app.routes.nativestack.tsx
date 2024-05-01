@@ -7,6 +7,7 @@ import { useTheme } from "native-base";
 import { AppRoutesBottomTab } from "./app.routes.bottomtab";
 import { MyProducts } from "@screens/MyProducts";
 import { photoFileProps, productsProps } from "@dtos/ProductDTO";
+import { ProductStatus } from "@screens/ProductStatus";
 
 type AppRoutesNativeStack = {
     BottomTabNavigator: undefined;
@@ -64,7 +65,10 @@ export function AppRoutesNativeStack() {
                 name="editProduct"
                 component={EditProduct}
             />
-
+            <Screen
+                name="productStatus"
+                component={ProductStatus}
+            />
         </Navigator>
     )
 }

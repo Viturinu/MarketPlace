@@ -1,9 +1,8 @@
 import { CarouselPicture } from "@components/CarouselPicture";
 import { Header } from "@components/Header";
 import { ProfilePicture } from "@components/ProfilePicture";
-import { Box, HStack, View, Text, TextArea, VStack, ScrollView, Center } from "native-base";
+import { Box, HStack, View, Text, VStack, ScrollView } from "native-base";
 import { Dimensions } from "react-native";
-import Avatar from "@assets/avatar.png"
 import Carousel from 'react-native-reanimated-carousel';
 import { LittleButton } from "@components/LittleButton";
 import { PaymentMethod } from "@components/PaymentMethod";
@@ -11,44 +10,65 @@ import { Button } from "@components/Button";
 import { Power, Trash } from "phosphor-react-native";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { productsProps } from "@dtos/ProductDTO";
-import { useEffect } from "react";
+import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import { err } from "react-native-svg";
+import { useState } from "react";
 
-type Props = {
-    active: boolean;
-}
-
-export function ProductStatus({ active }: Props) {
+export function ProductStatus() {
 
     const route = useRoute();
 
+    const navigation = useNavigation<AppRoutesNativeStackProps>();
+
     const product = route.params as productsProps;
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const { user } = useAuth();
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight40 = ((Dimensions.get('window').height) * 0.35);
 
-    useEffect(() => {
-        console.log(JSON.stringify(user));
-    }, [])
+    function handleActivateProduct() {
+        try {
+            setIsLoading(true);
+            api.patch(`/products/${product.id}`, {
+                "is_active": !product.is_active
+            })
+            navigation.goBack();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    function handleRemoveProduct() {
+        try {
+            setIsLoading(true);
+            api.delete(`/products/${product.id}`)
+            navigation.goBack();
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <Box
             backgroundColor="gray.200"
             flex={1}
         >
-            <Header backIcon />
+            <Header backIcon backIconFunction={() => navigation.goBack()} />
             <Box mt={2}>
                 <Carousel
                     width={screenWidth}
                     height={screenHeight40}
                     data={product.product_images}
+                    loop={false}
                     renderItem={({ item }) => {
                         return <CarouselPicture
-                            uri={item.path}
-                            active={active}
+                            uri={`${api.defaults.baseURL}/images/${item.path}`}
+                            active={product.is_active}
                         />
                     }}
                 />;
@@ -73,7 +93,7 @@ export function ProductStatus({ active }: Props) {
                             color="gray.600"
                             ml={2}
                         >
-                            {product.user.name}
+                            {user.name}
                         </Text>
                     </HStack>
                     <Box
@@ -129,11 +149,19 @@ export function ProductStatus({ active }: Props) {
                         <Box
                             mt={1}
                         >
-                            <PaymentMethod tipo="boleto" />
-                            <PaymentMethod tipo="card" />
-                            <PaymentMethod tipo="deposit" />
-                            <PaymentMethod tipo="cash" />
-                            <PaymentMethod tipo="pix" />
+                            {
+                                product.payment_methods.map(item => {
+                                    return item
+                                })
+
+                                product.payment_methods.forEach(item => {
+                                item.key === "boleto" && <PaymentMethod tipo="boleto" />
+                                    item.key === "boleto" && <PaymentMethod tipo="boleto" />
+                            item.key === "deposit" && <PaymentMethod tipo="deposit" />
+                            item.key === "cash" && <PaymentMethod tipo="cash" />
+                            item.key === "pix" && <PaymentMethod tipo="pix" />
+                                })
+                            }
                         </Box>
                     </VStack>
 
@@ -142,11 +170,12 @@ export function ProductStatus({ active }: Props) {
                     >
 
                         <Button
-                            title={active ? "Desativar anúncio" : "Reativar anúncio"}
-                            type={active ? "black" : "blue"}
+                            title={product.is_active ? "Desativar anúncio" : "Reativar anúncio"}
+                            type={product.is_active ? "black" : "blue"}
                             InternalIcon={Power}
                             weight="regular"
-
+                            onPress={handleActivateProduct}
+                            isLoading={isLoading}
                         />
                         <Button
                             title="Excluir anúncio"
@@ -155,6 +184,8 @@ export function ProductStatus({ active }: Props) {
                             mt={2}
                             weight="regular"
                             InternalIconColor="#5F5B62"
+                            onPress={handleRemoveProduct}
+                            isLoading={isLoading}
                         />
                     </View>
                 </Box>
