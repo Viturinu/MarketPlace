@@ -157,7 +157,7 @@ export function NewProduct() {
                             fontSize="xs"
                             color="gray.500"
                         >
-                            Escolha até 3 imagens para mostrar o quando o seu produto é incrível!
+                            Escolha até 4 imagens para mostrar o quando o seu produto é incrível!
                         </Text>
                     </VStack>
                     <Box>

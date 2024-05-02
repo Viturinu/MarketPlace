@@ -41,5 +41,6 @@ export type productsProps = {
     user?: {
         name: string;
         avatar: string;
+        tel: string;
     };
 }

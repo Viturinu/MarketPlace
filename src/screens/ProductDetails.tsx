@@ -2,7 +2,7 @@ import { CarouselPicture } from "@components/CarouselPicture";
 import { Header } from "@components/Header";
 import { ProfilePicture } from "@components/ProfilePicture";
 import { Box, HStack, View, Text, TextArea, VStack, ScrollView } from "native-base";
-import { Dimensions } from "react-native";
+import { Dimensions, Linking } from "react-native";
 import Carousel from 'react-native-reanimated-carousel';
 import { LittleButton } from "@components/LittleButton";
 import { PaymentMethod } from "@components/PaymentMethod";
@@ -15,6 +15,7 @@ import { productsProps } from "@dtos/ProductDTO";
 import { maskCurrency } from "@utils/masks";
 import { useEffect } from "react";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
+import { unmaskPhone } from "@utils/unmasks";
 
 export function ProductDetails() {
 
@@ -28,6 +29,22 @@ export function ProductDetails() {
     const product = route.params as productsProps;
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
+
+    async function handleWhatsAppMessage() {
+
+        const whatsappURL = `https://wa.me/55${unmaskPhone(product.user.tel)}`;
+
+        try {
+            const supported = await Linking.canOpenURL(whatsappURL); //verifica se é possivel abrir essa url
+            if (supported) { //positivo, logo ...
+                await Linking.openURL(whatsappURL); //abre url
+            } else {
+                console.log("Não é possível abrir o WhatsApp - " + whatsappURL);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <Box
@@ -165,6 +182,7 @@ export function ProductDetails() {
                         InternalIcon={WhatsappLogo}
                         weight="fill"
                         flex={0.5}
+                        onPress={handleWhatsAppMessage}
                     />
                 </HStack>
             </ScrollView>

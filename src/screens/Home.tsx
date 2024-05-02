@@ -13,7 +13,6 @@ import { useAuth } from "@hooks/useAuth";
 import { useCallback, useState } from "react";
 import { api } from "@services/api";
 import { productsProps } from "@dtos/ProductDTO";
-import { maskCurrency } from "@utils/masks";
 import { ModalFilter } from "@components/ModalFilter";
 
 export function Home() {

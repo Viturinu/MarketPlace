@@ -24,7 +24,7 @@ type AppRoutesNativeStack = {
     };
     productDetails: productsProps;
     productStatus: productsProps;
-    editProduct: undefined;
+    editProduct: productsProps;
 
 }
 

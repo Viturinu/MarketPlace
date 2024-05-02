@@ -13,7 +13,6 @@ import { useAuth } from "@hooks/useAuth";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { productsProps } from "@dtos/ProductDTO";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
-import { err } from "react-native-svg";
 import { useState } from "react";
 
 export function ProductStatus() {
@@ -58,7 +57,7 @@ export function ProductStatus() {
             backgroundColor="gray.200"
             flex={1}
         >
-            <Header backIcon backIconFunction={() => navigation.goBack()} />
+            <Header backIcon backIconFunction={() => navigation.goBack()} rightIcon="edit" rightIconFunction={() => navigation.navigate("editProduct", product)} />
             <Box mt={2}>
                 <Carousel
                     width={screenWidth}
@@ -149,19 +148,20 @@ export function ProductStatus() {
                         <Box
                             mt={1}
                         >
-                            {
-                                product.payment_methods.map(item => {
-                                    return item
-                                })
-
-                                product.payment_methods.forEach(item => {
-                                item.key === "boleto" && <PaymentMethod tipo="boleto" />
-                                    item.key === "boleto" && <PaymentMethod tipo="boleto" />
-                            item.key === "deposit" && <PaymentMethod tipo="deposit" />
-                            item.key === "cash" && <PaymentMethod tipo="cash" />
-                            item.key === "pix" && <PaymentMethod tipo="pix" />
-                                })
-                            }
+                            {product.payment_methods.map(item => {
+                                switch (item.key) {
+                                    case "boleto":
+                                        return <PaymentMethod key={item.key} tipo="boleto" />;
+                                    case "card":
+                                        return <PaymentMethod key={item.key} tipo="card" />;
+                                    case "deposit":
+                                        return <PaymentMethod key={item.key} tipo="deposit" />;
+                                    case "cash":
+                                        return <PaymentMethod key={item.key} tipo="cash" />;
+                                    default:
+                                        return <PaymentMethod key={item.key} tipo="pix" />;
+                                }
+                            })}
                         </Box>
                     </VStack>
 

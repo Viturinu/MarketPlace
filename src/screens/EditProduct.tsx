@@ -1,13 +1,19 @@
 import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
+import { productsProps } from "@dtos/ProductDTO";
+import { useRoute } from "@react-navigation/native";
 import { Box, Checkbox, HStack, Radio, ScrollView, Switch, Text, TextArea, VStack } from "native-base";
 import { Plus } from "phosphor-react-native";
 import { useState } from "react";
 
 export function EditProduct() {
 
-    const [newProduct, setNewProduct] = useState("new");
+    const route = useRoute();
+
+    const product = route.params as productsProps;
+
+    const [newProduct, setNewProduct] = useState(product.is_new ? "new" : "used");
 
     const [paymentMethods, setPaymentMethods] = useState([]);
 
@@ -40,7 +46,7 @@ export function EditProduct() {
                             fontSize="xs"
                             color="gray.500"
                         >
-                            Escolha até 3 imagens para mostrar o quando o seu produto é incrível!
+                            Escolha até 4 imagens para mostrar o quanto o seu produto é incrível!
                         </Text>
                     </VStack>
                     <Box
@@ -68,6 +74,7 @@ export function EditProduct() {
 
                         <Input
                             placeHolder="Título do anúncio"
+                            value={product.name}
                         />
 
                         <TextArea
@@ -78,6 +85,7 @@ export function EditProduct() {
                             placeholder="Descrição do produto"
                             fontSize="md"
                             minHeight={40}
+                            value={product.description}
                         />
 
 
@@ -132,7 +140,9 @@ export function EditProduct() {
                                 h={6}
                                 mt={2}
                             >
-                                <Switch size="lg" />
+                                <Switch
+                                    size="lg"
+                                />
                             </HStack>
                         </VStack>
 
