@@ -5,7 +5,7 @@ import * as yup from "yup"
 import { Box, Checkbox, FlatList, HStack, ScrollView, Switch, Text, useToast, Image, VStack, Icon, useTheme, View } from "native-base";
 import shortid from 'shortid';
 import { Plus, X } from "phosphor-react-native";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { CustumTextArea } from "@components/CustumTextArea";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableOpacity } from "react-native";
@@ -47,7 +47,7 @@ export function EditProduct() {
 
     const [pictureFiles, setPictureFiles] = useState<photoFileProps[]>([]);
 
-    const { control, handleSubmit, formState: { errors } } = useForm<productUploadProps>({
+    const { control, handleSubmit, formState: { errors }, setValue } = useForm<productUploadProps>({
         resolver: yupResolver(schema),
         values: { //vai dar erro, pois essas imagens estão com uri local, logo quando usuario for fazer a edição, talvez não terão mais essas fotos. A solução é reestruturar tudo, mas não vou fazer isso para avançar com aprendizado.
             images: pictureFiles,
@@ -146,8 +146,26 @@ export function EditProduct() {
 
     useEffect(() => {
         setIsLoading(true);
+
         paymentMethodStrings = product.payment_methods.map(objeto => objeto.key);
-        console.log(paymentMethodStrings)
+        setValue("payment_methods", paymentMethodStrings);
+
+        const pictureFiles: any[] = product.product_images.map(item => {
+
+            const photoName = item.path.split("-").pop();
+            const photoExtension = photoName.split(".").pop();
+
+            const pictureFile = {
+                id: item.id, //gerando um id unico pra cada foto
+                name: `${user.name}-${item.id}.${photoExtension}`.toLowerCase(),
+                uri: item.path,
+                type: `image/${photoExtension}`
+            } as any; //tem que colocar any, exigência do FormData
+
+            setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado com imagens pra fazer o upload
+
+        })
+
         setIsLoading(false);
     }, [])
 
