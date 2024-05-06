@@ -14,10 +14,12 @@ import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system"
 import { maskCurrency } from "@utils/masks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@hooks/useAuth";
 import { RadioControlled } from "@components/RadioControlled";
 import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
+import { unmaskCurrency } from "@utils/unmasks";
+import { api } from "@services/api";
 
 const schema = yup.object({
     name: yup.string().max(20, "Só é permitido 20 caracteres para o nome do produto").required("É necessário colocar um título para criar um registro"),
@@ -37,6 +39,10 @@ export function NewProduct() {
     const toast = useToast();
 
     const [pictureFiles, setPictureFiles] = useState<photoFileProps[]>([]);
+
+    const [productId, setProductId] = useState<string>();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const { control, handleSubmit, formState: { errors } } = useForm<productUploadProps>({
         resolver: yupResolver(schema)
@@ -78,26 +84,59 @@ export function NewProduct() {
                         )
                     }
 
+                    setIsLoading(true);
+
                     const photoExtension = userPhoto.assets[0].uri.split(".").pop(); //split na uri onde tem um ponto, e pop no ultimop elemento, no caso ficará a extensão
 
                     const pictureFile = {
-                        id: shortid.generate(), //gerando um id unico pra cada foto
+                        id: shortid.generate(), //gerando um id unico pra cada foto, pois precisamos apaga-la caso necessário
                         name: `${user.name}-${userPhoto.assets[0].fileName}.${photoExtension}`.toLowerCase(),
                         uri: userPhoto.assets[0].uri,
                         type: `${userPhoto.assets[0].type}/${photoExtension}`
                     } as any; //tem que colocar any, exigência do FormData
+
+                    let productPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
+
+                    productPhotoForm.append("product_id", productId); //recuperei o id no post de cima
+
+                    //productPhotoForm.append("images", images as any);
+
+                    productPhotoForm.append('images', {
+                        id: pictureFile.id,
+                        uri: userPhoto.assets[0].uri,
+                        name: `${user.name}-${userPhoto.assets[0].fileName}.${photoExtension}`.toLowerCase(),
+                        type: `${userPhoto.assets[0].type}/${photoExtension}`
+                    } as any);
+
+                    await api.post("/products/images", productPhotoForm, {
+                        headers: {
+                            "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
+                        }
+                    });
 
                     setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado com imagens pra fazer o upload
                 }
             }
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
-    function removeProductPicture(productPicture: photoFileProps) {
-        const newArray = pictureFiles.filter(item => item.id !== productPicture.id);
-        setPictureFiles(newArray);
+    async function removeProductPicture(productPicture: photoFileProps) {
+        try {
+            setIsLoading(true);
+            const newArray = pictureFiles.filter(item => item.id !== productPicture.id);
+            await api.delete("/products/images", {
+                data: { images: [productPicture.id] }
+            })
+            setPictureFiles(newArray);
+        } catch (error) {
+            console.log("Na remoção: " + error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     async function handleNextStep({ name, description, is_new, price, accept_trade, payment_methods }: productUploadProps) {
@@ -110,6 +149,11 @@ export function NewProduct() {
                     bgColor: "red.700"
                 })
             }
+
+            setIsLoading(true);
+
+            const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
+            const accept_trade_defining = accept_trade === undefined ? false : true;//necessário, pois por default value vem undefined
 
             navigation.navigate("productPreview", {
                 images: pictureFiles,
@@ -125,6 +169,28 @@ export function NewProduct() {
             console.log(JSON.stringify(error) + " - Aqui no upload do produto");
         }
     }
+
+    async function initialCreation() {
+        const formResponse = await api.post("/products", {
+            name: "name",
+            description: "description",
+            is_new: false,
+            price: 10,
+            accept_trade: false,
+            payment_methods: ["pix"]
+        })
+
+        return formResponse; //objetivo de buscar id do produto
+    }
+
+    /*
+    useEffect(() => { //usar then aqui, pois useEffect não aceita as palavras reservadas de await
+        initialCreation().then(response => {
+            setProductId(response.data.id);
+            console.log(response.data.id)
+        });
+    }, [])
+    */
 
     return (
         <Box

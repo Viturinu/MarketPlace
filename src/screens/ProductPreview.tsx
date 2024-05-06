@@ -55,8 +55,6 @@ export function ProductPreview() {
 
             let productPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
 
-            const product_id = formResponse.data.id;
-
             productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
 
             //productPhotoForm.append("images", images as any);
