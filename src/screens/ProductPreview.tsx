@@ -11,11 +11,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { productUploadProps } from "@dtos/ProductDTO";
+import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { unmaskCurrency } from "@utils/unmasks";
 import { useState } from "react";
+
+type productUploadPropsToEdit = productUploadProps & {
+    productId?: string;
+    newImages?: photoFileProps[];
+}
 
 export function ProductPreview() {
 
@@ -29,7 +34,7 @@ export function ProductPreview() {
 
     const route = useRoute();
 
-    const { images = [], name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadProps;
+    const { productId, images = [], newImages, name, description, is_new, price, accept_trade, payment_methods } = route.params as productUploadPropsToEdit;
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -41,10 +46,19 @@ export function ProductPreview() {
 
             setIsLoading(true);
 
-            const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
-            const accept_trade_defining = accept_trade === undefined ? false : true;//necessário, pois por default value vem undefined
+            console.log("ver qual o status do prodcutId: " + productId)
 
-            const formResponse = await api.post("/products", {
+            const is_new_boolean = is_new === "new" ? true : false;//necessário, pois por default radio vem coms string nos values
+            const accept_trade_defining = accept_trade === undefined ? false : accept_trade === false ? false : true;//necessário, pois por default value vem undefined
+
+            const formResponse = productId ? await api.put(`/products/${productId}`, {
+                name,
+                description,
+                is_new: is_new_boolean,
+                price: Number(unmaskCurrency(price)),
+                accept_trade: accept_trade_defining,
+                payment_methods
+            }) : await api.post("/products", {
                 name,
                 description,
                 is_new: is_new_boolean,
@@ -55,26 +69,53 @@ export function ProductPreview() {
 
             let productPhotoForm = new FormData(); //usado para pegar as fotos no click, trabalhar elas dentro do vetor, e depois sobrescrever com outra foto
 
-            productPhotoForm.append("product_id", formResponse.data.id); //recuperei o id no post de cima
+            productPhotoForm.append("product_id", productId ? productId : formResponse.data.id); //se for criado o id com o post, ele usa ele; se já existir e tiver na opção de edição, utiliza do id passado via navigations
 
             //productPhotoForm.append("images", images as any);
 
-            images.forEach((image) => {
+            productId ? newImages.forEach((image) => {
                 productPhotoForm.append('images', {
                     uri: image.uri,
                     name: image.name,
                     type: image.type
                 } as any);
-            });
+            })
+                : images.forEach((image) => {
+                    productPhotoForm.append('images', {
+                        uri: image.uri,
+                        name: image.name,
+                        type: image.type
+                    } as any);
+                });
 
             await api.post("/products/images", productPhotoForm, {
                 headers: {
                     "Content-Type": "multipart/form-data" //pra afirmar que não é mais um conteúdo JSON, e sim um multipart
                 }
-            });
+            })
+
+            //apagar as imagens antigas
+            if (productId) {
+
+                const arrayPhotosId = images.map(item => item.id);
+                console.log("Array com os ids: " + JSON.stringify(arrayPhotosId));
+
+                await api.delete("/products/images", {
+                    headers: {
+                        'accept': '*/*',
+                        'Content-Type': 'application/json'
+                    },
+                    data: {
+                        productImagesIds: arrayPhotosId
+                    }
+                })
+            }
+
+
+
 
             toast.show({
-                title: "Seu produto foi adicionado ao Market Place",
+                title: productId ? "Seu produto foi atualizado com sucesso" : "Seu produto foi adicionado ao Market Place",
                 placement: "top",
                 bgColor: "green.700"
             })
@@ -133,7 +174,7 @@ export function ProductPreview() {
                 <Carousel
                     width={screenWidth}
                     height={screenHeight38}
-                    data={images}
+                    data={newImages === undefined ? images : newImages}
                     loop={false}
                     renderItem={({ item }) => {
                         return <CarouselPicture
