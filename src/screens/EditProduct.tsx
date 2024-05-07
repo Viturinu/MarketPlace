@@ -19,6 +19,7 @@ import { useAuth } from "@hooks/useAuth";
 import { RadioControlled } from "@components/RadioControlled";
 import { photoFileProps, productUploadProps, productsProps } from "@dtos/ProductDTO";
 import { Loading } from "@components/Loading";
+import { api } from "@services/api";
 
 const schema = yup.object({
     name: yup.string().max(20, "Só é permitido 20 caracteres para o nome do produto").required("É necessário colocar um título para criar um registro"),
@@ -45,12 +46,12 @@ export function EditProduct() {
 
     const product = route.params as productsProps;
 
-    const [pictureFiles, setPictureFiles] = useState<photoFileProps[]>([]);
+    const [photoProducts, setPhotoProducts] = useState<photoFileProps[]>([]);
 
     const { control, handleSubmit, formState: { errors }, setValue } = useForm<productUploadProps>({
         resolver: yupResolver(schema),
         values: { //vai dar erro, pois essas imagens estão com uri local, logo quando usuario for fazer a edição, talvez não terão mais essas fotos. A solução é reestruturar tudo, mas não vou fazer isso para avançar com aprendizado.
-            images: pictureFiles,
+            images: photoProducts,
             name: product.name,
             description: product.description,
             is_new: product.is_new ? "new" : "used",
@@ -145,42 +146,48 @@ export function EditProduct() {
     }
 
     useEffect(() => {
-        setIsLoading(true);
+        try {
+            setIsLoading(true);
 
-        paymentMethodStrings = product.payment_methods.map(objeto => objeto.key);
-        setValue("payment_methods", paymentMethodStrings);
+            paymentMethodStrings = product.payment_methods.map(objeto => objeto.key);
+            setValue("payment_methods", paymentMethodStrings);
 
-        const pictureFiles: any[] = product.product_images.map(item => {
+            let photoProductsArray: photoFileProps[] = [];
+            product.product_images.forEach(item => {
 
-            const photoName = item.path.split("-").pop();
-            const photoExtension = photoName.split(".").pop();
+                const photoName = item.path.split("-").pop();
+                const photoExtension = photoName.split(".").pop();
 
-            const pictureFile = {
-                id: item.id, //gerando um id unico pra cada foto
-                name: `${user.name}-${item.id}.${photoExtension}`.toLowerCase(),
-                uri: item.path,
-                type: `image/${photoExtension}`
-            } as any; //tem que colocar any, exigência do FormData
+                photoProductsArray.push({
+                    id: item.id,
+                    name: `${user.name}-${item.id}.${photoExtension}`.toLowerCase(),
+                    uri: item.path,
+                    type: `image/${photoExtension}`
+                } as photoFileProps);
+            })
+            setPhotoProducts(photoProductsArray);//Atualizando estado com imagens pra fazer o upload
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoading(true);
+        }
 
-            setPictureFiles([...pictureFiles, pictureFile]);//Atualizando estado com imagens pra fazer o upload
 
-        })
-
-        setIsLoading(false);
     }, [])
 
     return (
-        <Box
-            flex={1}
-            backgroundColor="gray.200"
-        >
-            <Header
-                title="Criar anúncio"
-                backIcon
-                backIconFunction={() => navigation.goBack()}
-            />
-            {
-                !isLoading ?
+        isLoading ?
+            <Box
+                flex={1}
+                backgroundColor="gray.200"
+            >
+                <Header
+                    title="Editar anúncio"
+                    backIcon
+                    backIconFunction={() => navigation.goBack()}
+                />
+                {
+
                     <>
                         <ScrollView
                             showsVerticalScrollIndicator={false}
@@ -208,7 +215,7 @@ export function EditProduct() {
                                 </VStack>
                                 <Box>
                                     <FlatList
-                                        data={pictureFiles}
+                                        data={photoProducts}
                                         keyExtractor={item => `${item.id} - ${item.name}`}
                                         ListEmptyComponent={() =>
                                             <TouchableOpacity
@@ -230,7 +237,7 @@ export function EditProduct() {
                                         }
                                         renderItem={({ item, index }) => {
                                             // Verifica se este é o último item na lista
-                                            if (index === pictureFiles.length - 1) {
+                                            if (index === photoProducts.length - 1) {
                                                 return (
                                                     <HStack>
                                                         <HStack
@@ -244,7 +251,6 @@ export function EditProduct() {
                                                             <View
                                                                 zIndex={1}>
                                                                 <TouchableOpacity
-                                                                    onPress={() => removeProductPicture(item)}
                                                                 >
                                                                     <Box
                                                                         width={4}
@@ -262,7 +268,7 @@ export function EditProduct() {
                                                                 </TouchableOpacity>
                                                             </View>
                                                             <Image
-                                                                source={{ uri: item.uri }}
+                                                                source={{ uri: `${api.defaults.baseURL}/images/${item.uri}` }}
                                                                 alt={"foto do produto - " + index}
                                                                 height="100%"
                                                                 width="100%"
@@ -321,7 +327,7 @@ export function EditProduct() {
                                                             </TouchableOpacity>
                                                         </View>
                                                         <Image
-                                                            source={{ uri: item.uri }}
+                                                            source={{ uri: `${api.defaults.baseURL}/images/${item.uri}` }}
                                                             alt={"foto do produto - " + index}
                                                             height="100%"
                                                             width="100%"
@@ -512,9 +518,9 @@ export function EditProduct() {
                                 onPress={handleSubmit(handleNextStep)}
                             />
                         </HStack>
-                    </> : <Loading />
-            }
+                    </>
+                }
 
-        </Box>
+            </Box> : <Loading />
     )
 }
