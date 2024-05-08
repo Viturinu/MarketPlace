@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useAuth } from "@hooks/useAuth";
 import { RadioControlled } from "@components/RadioControlled";
 import { photoFileProps, productUploadProps } from "@dtos/ProductDTO";
+import { AppError } from "@utils/AppError";
 
 const schema = yup.object({
     name: yup.string().required("É necessário colocar um título para criar um registro"),
@@ -91,7 +92,7 @@ export function NewProduct() {
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.log(error); //aqui não precisa do trtamento de erro do interceptor, pois não faz chamada à API, logo não cairá naquele objeto criado e utilizado no interceptor
         }
     }
 
@@ -107,7 +108,7 @@ export function NewProduct() {
                 return toast.show({
                     title: "Você precisa inserir pelo menos uma imagem do seu produto.",
                     placement: "top",
-                    bgColor: "red.700"
+                    bgColor: "amber.500"
                 })
             }
 
@@ -122,7 +123,14 @@ export function NewProduct() {
             });
 
         } catch (error) {
-            console.log(JSON.stringify(error) + " - Aqui no upload do produto");
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
+
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
         }
     }
 

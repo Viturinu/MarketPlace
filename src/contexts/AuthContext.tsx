@@ -123,7 +123,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         return () => {
             subscribe(); //No React, quando você usa o useEffect, você pode retornar uma função que será executada quando o componente for desmontado, o que é conhecido como uma "função de limpeza" ou "cleanup function". Essa função de limpeza é opcional e é usada para limpar quaisquer efeitos secundários gerados pelo código dentro do useEffect antes que o componente seja removido do DOM.
         }
-    }, []);
+    }, []); //guarda relativamente o historico nas navegacoes, quando colocamos array vazio de dependencias... se não colocar, ele sempre carrega de novo, independente de navegação ou não (zero estado); o que eu entendi da explicação lida.
 
     return (
         <AuthContext.Provider

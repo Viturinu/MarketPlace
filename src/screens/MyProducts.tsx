@@ -1,11 +1,12 @@
 import { Header } from "@components/Header";
 import { ProductCard } from "@components/ProductCard";
-import { Box, Text, HStack, Select, CheckIcon, FlatList, Center, Image } from "native-base";
+import { Box, Text, HStack, Select, CheckIcon, FlatList, Center, Image, Skeleton, VStack, useToast } from "native-base";
 import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { api } from "@services/api";
 import { productsProps } from "@dtos/ProductDTO";
+import { AppError } from "@utils/AppError";
 
 export function MyProducts() {
 
@@ -16,6 +17,8 @@ export function MyProducts() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [productsArray, setProductArray] = useState<productsProps[]>([] as productsProps[]);
+
+    const toast = useToast();
 
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
@@ -39,7 +42,14 @@ export function MyProducts() {
                 setProductArray(newProductsArray);
             }
         } catch (error) {
-            console.log(error);
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
+
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
         }
         finally {
             setIsLoading(false);
@@ -53,15 +63,18 @@ export function MyProducts() {
             setProductArray(response.data);
 
         } catch (error) {
-            console.log(error);
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
+
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
         }
         finally {
             setIsLoading(false);
         }
-    }
-
-    function getInMyProduct() {
-        console.log("Entrei no meu produto" + productsArray.length);
     }
 
     useFocusEffect(useCallback(() => {
@@ -108,40 +121,83 @@ export function MyProducts() {
                 flex={1}
             >
                 {
-                    !isLoading && <FlatList
-                        data={productsArray}
-                        numColumns={2}
-                        keyExtractor={(item, index) => item.name + index}
-                        renderItem={({ item }) => (
-                            <ProductCard
-                                product={item}
-                                getInFunction={() => navigationStack.navigate("productStatus", item)}
-                                profilePicture={false}
-                            />
-                        )}
-                        style={{
-                            marginTop: 10,
-
-                        }}
-                        contentContainerStyle={[
-                            {
-                                paddingBottom: 80,
-                                justifyContent: "space-evenly"
-
-                            },
-                            productsArray.length === 0 && { flex: 1 },
-                        ]}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={() => (
-                            <Center
-                                flex={1}
-                                alignItems="center"
-                                justifyContent="center"
+                    isLoading ?
+                        <VStack
+                            flex={1}
+                            mt={3}
+                        >
+                            <HStack
+                                space={2}
                             >
-                                <Text color="gray.600" fontFamily="body"> Não há itens à venda por enquanto</Text>
-                            </Center>
-                        )}
-                    />
+                                <Skeleton
+                                    width={34}
+                                    height={24}
+                                    startColor="gray.400"
+                                    endColor="gray.300"
+                                    rounded={6}
+                                />
+                                <Skeleton
+                                    width={34}
+                                    height={24}
+                                    startColor="gray.400"
+                                    endColor="gray.300"
+                                    rounded={6}
+                                />
+                            </HStack>
+                            <HStack
+                                mt={2}
+                                space={2}
+                            >
+                                <Skeleton
+                                    width={34}
+                                    height={24}
+                                    startColor="gray.400"
+                                    endColor="gray.300"
+                                    rounded={6}
+                                />
+                                <Skeleton
+                                    width={34}
+                                    height={24}
+                                    startColor="gray.400"
+                                    endColor="gray.300"
+                                    rounded={6}
+                                />
+                            </HStack>
+                        </VStack>
+                        : <FlatList
+                            data={productsArray}
+                            numColumns={2}
+                            keyExtractor={(index) => String(index)}
+                            renderItem={({ item }) => (
+                                <ProductCard
+                                    product={item}
+                                    getInFunction={() => navigationStack.navigate("productStatus", item)}
+                                    profilePicture={false}
+                                />
+                            )}
+                            style={{
+                                marginTop: 10,
+
+                            }}
+                            contentContainerStyle={[
+                                {
+                                    paddingBottom: 80,
+                                    justifyContent: "space-evenly"
+
+                                },
+                                productsArray.length === 0 && { flex: 1 },
+                            ]}
+                            showsVerticalScrollIndicator={false}
+                            ListEmptyComponent={() => (
+                                <Center
+                                    flex={1}
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    <Text color="gray.600" fontFamily="body"> Não há itens à venda por enquanto</Text>
+                                </Center>
+                            )}
+                        />
 
                 }
             </Box>

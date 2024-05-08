@@ -1,4 +1,4 @@
-import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Modal, Switch, Checkbox } from "native-base";
+import { HStack, VStack, View, Text, useTheme, FlatList, Box, Center, Modal, Switch, Checkbox, Skeleton, useToast } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@components/Button";
 import { Plus, Tag, ArrowRight } from "phosphor-react-native";
@@ -14,6 +14,7 @@ import { useCallback, useState } from "react";
 import { api } from "@services/api";
 import { productsProps } from "@dtos/ProductDTO";
 import { ModalFilter } from "@components/ModalFilter";
+import { AppError } from "@utils/AppError";
 
 export function Home() {
 
@@ -31,14 +32,20 @@ export function Home() {
 
     const [showModal, setShowModal] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(true);
+
     const { user } = useAuth();
+
+    const toast = useToast();
 
     const { colors } = useTheme();
 
     async function loadUserImageAndAnnounces() {
         try {
+            setIsLoading(true);
             // Faça sua chamada à API para obter a imagem
             const arrayProducts = await api.get("/products");
+
             setProductsArray(arrayProducts.data);
 
             const myProductsArray = await api.get("/users/products"); //para contador na Home
@@ -49,12 +56,23 @@ export function Home() {
 
         } catch (error) {
             // Se ocorrer um erro ao fazer a chamada à API, trate o erro
-            console.log('Erro ao fazer a chamada à API');
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
+
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
+        } finally {
+            setIsLoading(false);
         }
     }
 
     async function handleSearch() {
         try {
+            setIsLoading(true);
+            setShowModal(false);
             const response = await api.get("/products", {
                 params: {
                     is_new: isNew,
@@ -66,9 +84,16 @@ export function Home() {
 
             setProductsArray(response.data);
         } catch (error) {
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
 
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
         } finally {
-            setShowModal(false);
+            setIsLoading(false);
         }
     }
 
@@ -79,7 +104,6 @@ export function Home() {
     }
 
     function handleGetInFunction(item: productsProps) {
-        JSON.stringify(item)
         navigationStack.navigate("productDetails", item);
     }
 
@@ -206,37 +230,82 @@ export function Home() {
                         </VStack>
                     </View>
 
-                    <FlatList
-                        data={productsArray}
-                        numColumns={2}
-                        keyExtractor={(item, index) => item.name + index}
-                        renderItem={({ item }) => (
-                            <ProductCard
-                                product={item}
-                                getInFunction={() => handleGetInFunction(item)}
-                            />
-                        )}
-                        style={{
-                            marginTop: 10,
-                        }}
-                        contentContainerStyle={[
-                            {
-                                paddingBottom: 30,
-                            },
-                            productsArray.length === 0 && { flex: 1 },
-                        ]}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={() => (
-                            <Center
+                    {
+                        isLoading ?
+                            <VStack
                                 flex={1}
-                                alignItems="center"
-                                justifyContent="center"
+                                space={2}
+                                mt={2}
                             >
-                                <Text color="gray.600" fontFamily="body"> Não há itens à venda por enquanto</Text>
-                            </Center>
-                        )}
-                    />
+                                <HStack
+                                    space={2}
+                                >
+                                    <Skeleton
+                                        width={34}
+                                        height={24}
+                                        startColor="gray.400"
+                                        endColor="gray.300"
+                                        rounded={6}
+                                    />
+                                    <Skeleton
+                                        width={34}
+                                        height={24}
+                                        startColor="gray.400"
+                                        endColor="gray.300"
+                                        rounded={6}
+                                    />
+                                </HStack>
+                                <HStack
+                                    space={2}
+                                >
+                                    <Skeleton
+                                        width={34}
+                                        height={24}
+                                        startColor="gray.400"
+                                        endColor="gray.300"
+                                        rounded={6}
+                                    />
+                                    <Skeleton
+                                        width={34}
+                                        height={24}
+                                        startColor="gray.400"
+                                        endColor="gray.300"
+                                        rounded={6}
+                                    />
+                                </HStack>
+                            </VStack>
+                            : <FlatList
+                                data={productsArray}
+                                numColumns={2}
+                                keyExtractor={(index) => String(index)}
+                                renderItem={({ item }) => (
+                                    <ProductCard
+                                        product={item}
+                                        getInFunction={() => handleGetInFunction(item)}
+                                    />
+                                )}
+                                style={{
+                                    marginTop: 10,
+                                }}
+                                contentContainerStyle={[
+                                    {
+                                        paddingBottom: 30,
+                                    },
+                                    productsArray.length === 0 && { flex: 1 },
+                                ]}
+                                showsVerticalScrollIndicator={false}
+                                ListEmptyComponent={() => (
+                                    <Center
+                                        flex={1}
+                                        alignItems="center"
+                                        justifyContent="center"
+                                    >
+                                        <Text color="gray.600" fontFamily="body"> Não há itens à venda por enquanto</Text>
+                                    </Center>
+                                )}
+                            />
 
+                    }
                 </Box>
 
             </SafeAreaView>

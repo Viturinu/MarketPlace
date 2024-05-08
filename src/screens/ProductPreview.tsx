@@ -16,6 +16,7 @@ import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { unmaskCurrency } from "@utils/unmasks";
 import { useState } from "react";
+import { AppError } from "@utils/AppError";
 
 type productUploadPropsToEdit = productUploadProps & {
     productId?: string;
@@ -98,7 +99,6 @@ export function ProductPreview() {
             if (productId) {
 
                 const arrayPhotosId = images.map(item => item.id);
-                console.log("Array com os ids: " + JSON.stringify(arrayPhotosId));
 
                 await api.delete("/products/images", {
                     headers: {
@@ -111,9 +111,6 @@ export function ProductPreview() {
                 })
             }
 
-
-
-
             toast.show({
                 title: productId ? "Seu produto foi atualizado com sucesso" : "Seu produto foi adicionado ao Market Place",
                 placement: "top",
@@ -124,20 +121,16 @@ export function ProductPreview() {
                 navigation.navigate("BottomTabNavigator");
             }, 2000);
         } catch (error) {
-            console.error('Erro ao enviar dados para a API:', error);
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
 
-            // Verificar se o erro é uma instância de Error e se possui uma propriedade 'message'
-            const errorMessage = error instanceof Error && error.message ? error.message : 'Erro desconhecido';
-
-            // Exibir mensagem de erro no Toast
-            return toast.show({
-                title: errorMessage,
+            toast.show({
+                title,
                 placement: "top",
                 bgColor: "red.700"
-            });
+            })
         }
     }
-
     return (
         <Box
             backgroundColor="gray.200"

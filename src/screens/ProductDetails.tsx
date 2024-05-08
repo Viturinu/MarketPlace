@@ -9,17 +9,13 @@ import { PaymentMethod } from "@components/PaymentMethod";
 import { Button } from "@components/Button";
 import { WhatsappLogo } from "phosphor-react-native";
 import { api } from "@services/api";
-import { useAuth } from "@hooks/useAuth";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { productsProps } from "@dtos/ProductDTO";
 import { maskCurrency } from "@utils/masks";
-import { useEffect } from "react";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { unmaskPhone } from "@utils/unmasks";
 
 export function ProductDetails() {
-
-    const { user } = useAuth();
 
     const screenWidth = Dimensions.get('window').width;
     const screenHeight38 = ((Dimensions.get('window').height) * 0.38);
@@ -31,7 +27,7 @@ export function ProductDetails() {
     const navigation = useNavigation<AppRoutesNativeStackProps>();
 
     async function handleWhatsAppMessage() {
-
+        console.log(product.user.name)
         const whatsappURL = `https://wa.me/55${unmaskPhone(product.user.tel)}`;
 
         try {

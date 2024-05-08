@@ -1,7 +1,7 @@
 import { CarouselPicture } from "@components/CarouselPicture";
 import { Header } from "@components/Header";
 import { ProfilePicture } from "@components/ProfilePicture";
-import { Box, HStack, View, Text, VStack, ScrollView } from "native-base";
+import { Box, HStack, View, Text, VStack, ScrollView, useToast } from "native-base";
 import { Dimensions } from "react-native";
 import Carousel from 'react-native-reanimated-carousel';
 import { LittleButton } from "@components/LittleButton";
@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { productsProps } from "@dtos/ProductDTO";
 import { AppRoutesNativeStackProps } from "@routes/app.routes.nativestack";
 import { useState } from "react";
+import { AppError } from "@utils/AppError";
 
 export function ProductStatus() {
 
@@ -27,6 +28,8 @@ export function ProductStatus() {
 
     const { user } = useAuth();
 
+    const toast = useToast();
+
     const screenWidth = Dimensions.get('window').width;
     const screenHeight40 = ((Dimensions.get('window').height) * 0.35);
 
@@ -38,7 +41,14 @@ export function ProductStatus() {
             })
             navigation.goBack();
         } catch (error) {
-            console.log(error);
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
+
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
         }
     }
 
@@ -48,7 +58,14 @@ export function ProductStatus() {
             api.delete(`/products/${product.id}`)
             navigation.goBack();
         } catch (error) {
-            console.log(error);
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Não foi possível realizar essa operação agora."
+
+            toast.show({
+                title,
+                placement: "top",
+                bgColor: "red.700"
+            })
         }
     }
 

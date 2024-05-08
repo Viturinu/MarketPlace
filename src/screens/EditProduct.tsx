@@ -40,7 +40,7 @@ export function EditProduct() {
 
     const route = useRoute();
 
-    let paymentMethodStrings: string[] = [];
+    const [paymentMethodStrings, setPaymentMethodStrings] = useState<string[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -152,7 +152,8 @@ export function EditProduct() {
         try {
             setIsLoading(true);
 
-            paymentMethodStrings = product.payment_methods.map(objeto => objeto.key);
+            const paymentMethodStringsVariable = product.payment_methods.map(objeto => objeto.key);
+            setPaymentMethodStrings(paymentMethodStringsVariable);
             setValue("payment_methods", paymentMethodStrings);
 
             let photoProductsArray: photoFileProps[] = [];
@@ -168,20 +169,18 @@ export function EditProduct() {
                     type: `image/${photoExtension}`
                 } as photoFileProps);
             })
-            setPhotoProducts(photoProductsArray);//Atualizando estado com imagens pra enviar pra PreviewScreen e apagar, subindo o outro array abaixo
+            setPhotoProducts(photoProductsArray);//Atualizando estado com imagens pra enviar pra PreviewScreen e apagar, depois de subir as novas imagens (mesmo sendo duplicadas -sem usuario ter alterado - mas depois apagaremos as velhas), subindo o outro array abaixo
             setNewPhotoProducts(photoProductsArray);//Atualizando estado com imagens pra fazer o upload
 
         } catch (error) {
             console.log(error)
         } finally {
-            setIsLoading(true);
+            setIsLoading(false);
         }
-
-
     }, [])
 
     return (
-        isLoading ?
+        !isLoading ?
             <Box
                 flex={1}
                 backgroundColor="gray.200"
